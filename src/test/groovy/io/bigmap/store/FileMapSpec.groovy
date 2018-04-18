@@ -76,12 +76,18 @@ class FileMapSpec extends Specification {
         head == "great value12345"
     }
 
-    def "should return null if key was not found"() {
+    def "should return empty optional if key was not found"() {
         given:
         FileMap map = new FileMap(filePath, new InMemoryIndex())
 
         when:
         def result = map.get(Key.of('1', '1234'))
+
+        then:
+        !result.isPresent()
+
+        when:
+        result = map.getHead('1234')
 
         then:
         !result.isPresent()
