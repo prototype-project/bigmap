@@ -3,9 +3,11 @@ package io.bigmap.store.map.infrastructure;
 import io.bigmap.store.map.Index;
 import io.bigmap.store.map.Key;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class InMemoryIndex implements Index {
     private final Map<Key, ValuePosition> positions = new ConcurrentHashMap<>();
@@ -37,5 +39,20 @@ public class InMemoryIndex implements Index {
     @Override
     public boolean contains(Key key) {
         return positions.containsKey(key);
+    }
+
+    @Override
+    public boolean containsHead(String id) {
+        return headPositions.containsKey(id);
+    }
+
+    @Override
+    public void delete(String id) {
+        headPositions.remove(id);
+        List<Key> toRemove = positions.entrySet().stream()
+                .filter(e -> e.getKey().getId().equals(id))
+                .map(e -> e.getKey())
+                .collect(Collectors.toList());
+        toRemove.forEach(positions::remove);
     }
 }

@@ -60,14 +60,15 @@ class FileMapSpec extends Specification {
         thrown(KeyDuplicationException)
     }
 
-    def "should return newest object on demand"() {
+    def "should return newest object"() {
         given:
         FileMap map = new FileMap(filePath, new InMemoryIndex())
+        def id = 'id123'
 
         and:
-        map.add(Key.of('1', 'id123'), "great value123")
-        map.add(Key.of('2', 'id123'), "great value1234")
-        map.add(Key.of('3', 'id123'), "great value12345")
+        map.add(Key.of('1', id), "great value123")
+        map.add(Key.of('2', id), "great value1234")
+        map.add(Key.of('3', id), "great value12345")
 
         when:
         String head = map.getHead("id123").get()
@@ -91,5 +92,32 @@ class FileMapSpec extends Specification {
 
         then:
         !result.isPresent()
+    }
+
+    def "should delete key"() {
+        given:
+        FileMap map = new FileMap(filePath, new InMemoryIndex())
+        def id = 'id123'
+        def id2 = "id2"
+
+        and:
+        map.add(Key.of('1', id2), "meh")
+
+        map.add(Key.of('1', id), "great value123")
+        map.add(Key.of('2', id), "great value1234")
+        map.add(Key.of('3', id), "great value12345")
+
+        when:
+        map.delete(id)
+
+        then:
+        !map.getHead(id).isPresent()
+        !map.get(Key.of('1', id)).isPresent()
+        !map.get(Key.of('2', id)).isPresent()
+        !map.get(Key.of('3', id)).isPresent()
+
+        and:
+        map.getHead(id2).isPresent()
+        map.get(Key.of('1', id2)).isPresent()
     }
 }

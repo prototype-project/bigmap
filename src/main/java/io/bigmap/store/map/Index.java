@@ -15,5 +15,7 @@ public interface Index {
 
     boolean contains(Key key);
 
+    boolean containsHead(String id);
 
+    void delete(String id);
 }

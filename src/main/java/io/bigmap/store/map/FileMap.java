@@ -28,7 +28,7 @@ public class FileMap {
         return index.headPosition(id).map(this::getValueFromPosition);
     }
 
-    private String getValueFromPosition(ValuePosition position) {
+    synchronized private String getValueFromPosition(ValuePosition position) {
         try {
             RandomAccessFile reader = new RandomAccessFile(filePath, "r");
             reader.seek(position.getOffset());
@@ -39,6 +39,13 @@ public class FileMap {
         } catch (IOException e) {
             throw new CriticalError("IOException caught in getValueFromPosition for: " + position.toString());
         }
+    }
+
+    synchronized public void delete(String id) {
+        if (!index.containsHead(id)) {
+            throw new KeyNotFoundException();
+        }
+        index.delete(id);
     }
 
     synchronized public void add(Key key, String value) throws IOException, KeyDuplicationException {
