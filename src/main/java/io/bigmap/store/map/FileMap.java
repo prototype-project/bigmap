@@ -47,14 +47,20 @@ public class FileMap {
         index.delete(id);
     }
 
-    synchronized public void add(Key key, String value) throws IOException, KeyDuplicationException {
+    synchronized public void add(Key key, String value) throws KeyDuplicationException {
         if (index.contains(key)) {
             throw new KeyDuplicationException();
         }
-        RandomAccessFile writer = new RandomAccessFile(filePath, "rw");
-        writer.seek(index.tail());
-        writer.writeBytes(value);
-        writer.close();
+        try {
+            RandomAccessFile writer = new RandomAccessFile(filePath, "rw");
+            writer.seek(index.tail());
+            writer.writeBytes(value);
+            writer.close();
+        } catch (IOException e) {
+            throw new CriticalError(
+                    "IOException caught in add for key:\n " + key.toString() + "\nand value:\n" + value);
+
+        }
         index.extend(key, value.getBytes().length);
     }
 }

@@ -42,4 +42,12 @@ public class Key {
         result = 31 * result + id.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Key{" +
+                "version='" + version + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }
