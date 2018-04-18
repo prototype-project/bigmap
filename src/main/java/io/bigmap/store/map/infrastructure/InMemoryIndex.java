@@ -4,6 +4,7 @@ import io.bigmap.store.map.Index;
 import io.bigmap.store.map.Key;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryIndex implements Index {
@@ -12,13 +13,13 @@ public class InMemoryIndex implements Index {
     private int tail = 0;
 
     @Override
-    public ValuePosition position(Key key) {
-        return positions.get(key);
+    public Optional<ValuePosition> position(Key key) {
+        return Optional.ofNullable(positions.get(key));
     }
 
     @Override
-    public ValuePosition headPosition(String id) {
-        return headPositions.get(id);
+    public Optional<ValuePosition> headPosition(String id) {
+        return Optional.ofNullable(headPositions.get(id));
     }
 
     @Override

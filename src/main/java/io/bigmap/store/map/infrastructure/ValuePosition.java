@@ -16,4 +16,12 @@ public class ValuePosition {
     public int getLength() {
         return length;
     }
+
+    @Override
+    public String toString() {
+        return "ValuePosition{" +
+                "offset=" + offset +
+                ", length=" + length +
+                '}';
+    }
 }

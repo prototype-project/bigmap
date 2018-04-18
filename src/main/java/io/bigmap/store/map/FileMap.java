@@ -6,6 +6,7 @@ import io.bigmap.store.map.infrastructure.ValuePosition;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 public class FileMap {
     private final Index index;
@@ -19,21 +20,25 @@ public class FileMap {
         this.index = index;
     }
 
-    public String get(Key key) throws IOException {
-        return getValueFromPosition(index.position(key));
+    public Optional<String> get(Key key) {
+        return index.position(key).map(this::getValueFromPosition);
     }
 
-    public String getHead(String id) throws IOException {
-        return getValueFromPosition(index.headPosition(id));
+    public Optional<String> getHead(String id) {
+        return index.headPosition(id).map(this::getValueFromPosition);
     }
 
-    private String getValueFromPosition(ValuePosition position) throws IOException {
-        RandomAccessFile reader = new RandomAccessFile(filePath, "r");
-        reader.seek(position.getOffset());
-        byte[] result = new byte[position.getLength()];
-        reader.read(result, 0, position.getLength());
-        reader.close();
-        return new String(result, StandardCharsets.UTF_8);
+    private String getValueFromPosition(ValuePosition position) {
+        try {
+            RandomAccessFile reader = new RandomAccessFile(filePath, "r");
+            reader.seek(position.getOffset());
+            byte[] result = new byte[position.getLength()];
+            reader.read(result, 0, position.getLength());
+            reader.close();
+            return new String(result, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new CriticalError("IOException caught in getValueFromPosition for: " + position.toString());
+        }
     }
 
     synchronized public void add(Key key, String value) throws IOException, KeyDuplicationException {

@@ -25,7 +25,7 @@ class FileMapSpec extends Specification {
         map.add(k, "greatvalue123")
 
         then:
-        map.get(k) == "greatvalue123"
+        map.get(k).get() == "greatvalue123"
     }
 
     def "should read/write multiple values"() {
@@ -39,10 +39,10 @@ class FileMapSpec extends Specification {
         map.add(Key.of('2', 'id123'), "different value123")
 
         then:
-        map.get(Key.of('1', 'id123')) == "great value123"
+        map.get(Key.of('1', 'id123')).get() == "great value123"
 
         and:
-        map.get(Key.of('2', 'id123')) == "different value123"
+        map.get(Key.of('2', 'id123')).get() == "different value123"
     }
 
     def "should throw error when trying to update existing key"() {
@@ -70,9 +70,20 @@ class FileMapSpec extends Specification {
         map.add(Key.of('3', 'id123'), "great value12345")
 
         when:
-        String head = map.getHead("id123")
+        String head = map.getHead("id123").get()
 
         then:
         head == "great value12345"
+    }
+
+    def "should return null if key was not found"() {
+        given:
+        FileMap map = new FileMap(filePath, new InMemoryIndex())
+
+        when:
+        def result = map.get(Key.of('1', '1234'))
+
+        then:
+        !result.isPresent()
     }
 }

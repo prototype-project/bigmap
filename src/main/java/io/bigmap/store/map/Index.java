@@ -2,10 +2,12 @@ package io.bigmap.store.map;
 
 import io.bigmap.store.map.infrastructure.ValuePosition;
 
-public interface Index {
-    ValuePosition position(Key key);
+import java.util.Optional;
 
-    ValuePosition headPosition(String id);
+public interface Index {
+    Optional<ValuePosition> position(Key key);
+
+    Optional<ValuePosition> headPosition(String id);
 
     int tail();
 
