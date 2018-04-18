@@ -1,8 +1,8 @@
 package io.bigmap.store.map.application;
 
-import io.bigmap.store.map.FileMap;
-import io.bigmap.store.map.Key;
+import io.bigmap.store.map.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +14,13 @@ class MapController {
         this.map = map;
     }
 
-    @GetMapping
+    @GetMapping(path = "{id}")
     @ResponseStatus(HttpStatus.OK)
-    String get(@PathVariable String id) {
-        return map.getHead(id).orElse(null);
+    @ResponseBody String get(@PathVariable String id) {
+        return map.getHead(id).orElseThrow(KeyNotFoundException::new);
     }
 
-    @PostMapping
+    @PostMapping(path = "{id}/{version}")
     @ResponseStatus(HttpStatus.CREATED)
     void add(@PathVariable String id, @PathVariable String version, @RequestBody String value) {
         map.add(Key.of(version, id), value);
@@ -30,5 +30,20 @@ class MapController {
     @ResponseStatus(HttpStatus.OK)
     void delete(@PathVariable String id) {
         map.delete(id);
+    }
+
+    @ExceptionHandler(CriticalError.class)
+    ResponseEntity handle(CriticalError exception) {
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(KeyDuplicationException.class)
+    ResponseEntity handle(KeyDuplicationException exception) {
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(KeyNotFoundException.class)
+    ResponseEntity handle(KeyNotFoundException exception) {
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 }
