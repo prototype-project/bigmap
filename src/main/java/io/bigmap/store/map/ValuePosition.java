@@ -1,19 +1,19 @@
-package io.bigmap.store.map.infrastructure;
+package io.bigmap.store.map;
 
 public class ValuePosition {
     private final int offset;
     private final int length;
 
-    ValuePosition(int offset, int length) {
+    public ValuePosition(int offset, int length) {
         this.offset = offset;
         this.length = length;
     }
 
-    public int getOffset() {
+    int getOffset() {
         return offset;
     }
 
-    public int getLength() {
+    int getLength() {
         return length;
     }
 

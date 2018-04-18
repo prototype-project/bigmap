@@ -1,7 +1,6 @@
 package io.bigmap.store.map;
 
 import com.google.common.base.Preconditions;
-import io.bigmap.store.map.infrastructure.ValuePosition;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

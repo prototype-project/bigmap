@@ -1,7 +1,5 @@
 package io.bigmap.store.map;
 
-import io.bigmap.store.map.infrastructure.ValuePosition;
-
 import java.util.Optional;
 
 public interface Index {

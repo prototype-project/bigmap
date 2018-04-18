@@ -2,6 +2,7 @@ package io.bigmap.store.map.infrastructure;
 
 import io.bigmap.store.map.Index;
 import io.bigmap.store.map.Key;
+import io.bigmap.store.map.ValuePosition;
 
 import java.util.List;
 import java.util.Map;
