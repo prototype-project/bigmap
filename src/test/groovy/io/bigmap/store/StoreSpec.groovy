@@ -1,5 +1,6 @@
 package io.bigmap.store
 
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 class StoreSpec extends BaseIntegrationSpec {
@@ -9,16 +10,16 @@ class StoreSpec extends BaseIntegrationSpec {
     def "should add value to store and return value from store"() {
         given:
 
-        String key1 = 'johnSmith1'
-        String value1 = 'agentSmith1'
+        String key1 = UUID.randomUUID()
+        String value1 = UUID.randomUUID()
 
         and:
-        String key2 = 'johnSmith2'
-        String value2 = 'agentSmith2'
+        String key2 = UUID.randomUUID()
+        String value2 = UUID.randomUUID()
 
         and:
-        String key3 = 'johnSmith3'
-        String value3 = 'agentSmith3'
+        String key3 = UUID.randomUUID()
+        String value3 = UUID.randomUUID()
 
         when:
         restTemplate.put(localUrl("/${key1}"), value1)
@@ -41,7 +42,7 @@ class StoreSpec extends BaseIntegrationSpec {
 
     def "should override existing value"() {
         given:
-        String key1 = 'johnSmith1'
+        String key1 = UUID.randomUUID()
 
         and:
         restTemplate.put(localUrl("/${key1}"), "oldValue")
@@ -51,5 +52,27 @@ class StoreSpec extends BaseIntegrationSpec {
 
         then:
         restTemplate.getForEntity(localUrl("/${key1}"), String.class).body == "newValue"
+    }
+
+    def "should return 404 when key not found"() {
+        given:
+        String key1 = UUID.randomUUID()
+
+        when:
+        restTemplate.getForEntity(localUrl("/${key1}"), String.class)
+
+        then:
+        thrown(HttpClientErrorException)
+    }
+
+    def "should return 400 when value not provided"() {
+        given:
+        String key1 = UUID.randomUUID()
+
+        when:
+        restTemplate.put(localUrl("/${key1}"), null)
+
+        then:
+        thrown(HttpClientErrorException)
     }
 }

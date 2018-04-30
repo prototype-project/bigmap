@@ -39,7 +39,6 @@ public class FileMap implements StoreMap {
         } else {
             return Optional.empty();
         }
-
     }
 
     @Override
