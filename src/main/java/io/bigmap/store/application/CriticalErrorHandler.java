@@ -13,10 +13,10 @@ import java.util.HashMap;
 
 
 @ControllerAdvice
-public class CriticalErrorHandler extends ResponseEntityExceptionHandler {
+class CriticalErrorHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = { CriticalError.class })
-    protected ResponseEntity<Object> handleConflict(Exception error, WebRequest request) {
+    @ExceptionHandler(CriticalError.class)
+    ResponseEntity<Object> handleCriticalError(Exception error, WebRequest request) {
         return handleExceptionInternal(error, new HashMap<>(),
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
