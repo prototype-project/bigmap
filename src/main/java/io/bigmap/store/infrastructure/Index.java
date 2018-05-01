@@ -12,11 +12,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Index {
+class Index {
     private final Map<String, Position> positions = new ConcurrentHashMap<>();
     private final PartitionsManager partitionsManager;
 
-    public Index(PartitionsManager partitionsManager) {
+    Index(PartitionsManager partitionsManager) {
         try {
             loadPositions(partitionsManager.getPartitionPaths(), this.positions);
             this.partitionsManager = partitionsManager;
@@ -94,5 +94,9 @@ public class Index {
 
     String getCurrentPartitionFilePath() {
         return partitionsManager.getCurrentPartitionFilePath();
+    }
+
+    String getPartitionsDirPath() {
+        return partitionsManager.getPartitionsDirPath();
     }
 }

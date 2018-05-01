@@ -13,14 +13,18 @@ import java.util.Optional;
 public class FileMap implements StoreMap {
 
     private final Index index;
+    private final StoreMapFactory storeMapFactory;
 
-    public FileMap(
-            Index index) {
+    FileMap(
+            Index index,
+            StoreMapFactory storeMapFactory) {
         this.index = index;
+        this.storeMapFactory = storeMapFactory;
     }
 
     @Override
-    public Optional<String> get(String key) throws CriticalError {
+    public Optional<String> get(String key)
+            throws CriticalError {
         Optional<Position> positionOptional = index.get(key);
         if (positionOptional.isPresent()) {
             Position position = positionOptional.get();
@@ -40,7 +44,8 @@ public class FileMap implements StoreMap {
     }
 
     @Override
-    synchronized public void put(String key, String value) throws CriticalError {
+    synchronized public void put(String key, String value)
+            throws CriticalError {
         String segment = key.getBytes().length + "," + value.getBytes().length + "\n" + key + value;
         String path = index.getCurrentPartitionFilePath();
         try {
@@ -52,5 +57,8 @@ public class FileMap implements StoreMap {
         } catch (IOException e) {
             throw new CriticalError();
         }
+    }
+
+    void cleanup() {
     }
 }

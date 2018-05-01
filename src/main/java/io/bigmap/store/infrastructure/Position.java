@@ -22,7 +22,7 @@ class Position {
         return length;
     }
 
-    public String getPartitionFilePath() {
+    String getPartitionFilePath() {
         return partitionFilePath;
     }
 }

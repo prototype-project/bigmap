@@ -7,18 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PartitionsManager {
+class PartitionsManager {
     private final String partitionsDirPath;
     private final int partitionSizeThreshold;
 
     private int currentPartitionNumber;
     private int currentPartitionSizeBytes;
 
-    public PartitionsManager(
+    PartitionsManager(
             String partitionsDirPath,
-            int partitionSizeThreshold) {
+            int partitionSizeThresholdBytes) {
         this.partitionsDirPath = partitionsDirPath;
-        this.partitionSizeThreshold = partitionSizeThreshold;
+        this.partitionSizeThreshold = partitionSizeThresholdBytes;
         this.currentPartitionNumber = getCurrentPartitionNumber(partitionsDirPath) + 1;
         this.currentPartitionSizeBytes = 0;
     }
@@ -65,5 +65,9 @@ public class PartitionsManager {
 
     String getCurrentPartitionFilePath() {
         return partitionsDirPath + "/" + currentPartitionNumber;
+    }
+
+    String getPartitionsDirPath() {
+        return partitionsDirPath;
     }
 }
