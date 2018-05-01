@@ -13,9 +13,12 @@ import java.util.*;
 public class FileMap implements StoreMap {
 
     private final Index index;
+    private int putCounter = 0;
+    private final int numberOfPutsThreshold;
 
-    FileMap(Index index) {
+    FileMap(Index index, int numberOfPutsThreshold) {
         this.index = index;
+        this.numberOfPutsThreshold = numberOfPutsThreshold;
     }
 
     @Override
@@ -50,17 +53,20 @@ public class FileMap implements StoreMap {
             }
             Files.write(Paths.get(path), segment.getBytes(), StandardOpenOption.APPEND);
             index.update(key, value);
+            putCounter++;
         } catch (IOException e) {
             throw new CriticalError();
         }
     }
 
     synchronized void cleanup() {
-        Map<String, Position> positions = index.getAllPositions();
-        String lastPartitionFilePath = index.getCurrentPartitionFilePath();
-        Set<String> toDelete = new HashSet<>(index.getPartitionPaths());
-        toDelete.remove(lastPartitionFilePath);
-        positions.forEach((k, v) -> put(k, get(k).orElseThrow(CriticalError::new)));
-        index.removePartitions(new ArrayList<>(toDelete));
+        if (putCounter >= numberOfPutsThreshold) {
+            Map<String, Position> positions = index.getAllPositions();
+            String lastPartitionFilePath = index.getCurrentPartitionFilePath();
+            Set<String> toDelete = new HashSet<>(index.getPartitionPaths());
+            toDelete.remove(lastPartitionFilePath);
+            positions.forEach((k, v) -> put(k, get(k).orElseThrow(CriticalError::new)));
+            index.removePartitions(new ArrayList<>(toDelete));
+        }
     }
 }

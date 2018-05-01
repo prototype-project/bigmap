@@ -9,7 +9,6 @@ class StoreSpec extends BaseIntegrationSpec {
 
     def "should add value to store and return value from store"() {
         given:
-
         String key1 = UUID.randomUUID()
         String value1 = UUID.randomUUID()
 
