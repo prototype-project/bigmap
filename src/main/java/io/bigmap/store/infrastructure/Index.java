@@ -7,27 +7,36 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Index {
-    private final Map<String, Position> positions;
-    private int offset;
+    private final Map<String, Position> positions = new ConcurrentHashMap<>();
+    private final PartitionsManager partitionsManager;
 
-    public Index(String path) {
+    public Index(PartitionsManager partitionsManager) {
         try {
-            positions = loadPositionsAndSetOffset(path);
+            loadPositions(partitionsManager.getPartitionPaths(), this.positions);
+            this.partitionsManager = partitionsManager;
         } catch (IOException e) {
             throw new CriticalError();
         }
     }
+    private void loadPositions(
+            List<String> partitionFilePaths,
+            Map<String, Position> positions) throws IOException {
+        for (String path: partitionFilePaths) {
+            loadPositions(path, positions);
+        }
+    }
 
-    private Map<String, Position> loadPositionsAndSetOffset(String path) throws IOException {
-        Map<String, Position> result = new ConcurrentHashMap<>();
-
-        RandomAccessFile reader = new RandomAccessFile(path, "r");
-        BufferedReader lineReader = new BufferedReader(new FileReader(path));
+    private void loadPositions(
+            String partitionFilePath,
+            Map<String, Position> positions) throws IOException {
+        RandomAccessFile reader = new RandomAccessFile(partitionFilePath, "r");
+        BufferedReader lineReader = new BufferedReader(new FileReader(partitionFilePath));
         int newLineCharLength = "\n".getBytes().length;
 
         int offset = 0;
@@ -53,17 +62,14 @@ public class Index {
 
             Position position = new Position(
                     offset + keyAndValueLength.getBytes().length + newLineCharLength + keyLength,
-                    valueLength);
-            result.put(key, position);
+                    valueLength,
+                    partitionFilePath);
+            positions.put(key, position);
 
             offset += keyAndValueLength.getBytes().length + newLineCharLength + keyLength + valueLength;
             lineReader.skip(key.length() + value.length());
             reader.seek(offset);
         }
-
-        this.offset = offset;
-
-        return result;
     }
 
     Optional<Position> get(String key) {
@@ -71,9 +77,22 @@ public class Index {
     }
 
     void update(String key, String value) {
+        int offset = partitionsManager.getOffset();
         String positionPrefix = key.getBytes().length + "," + value.getBytes().length + "\n";
         int valueOffset = positionPrefix.getBytes().length + key.getBytes().length;
-        positions.put(key, new Position(offset + valueOffset, value.getBytes().length));
-        offset += valueOffset + value.getBytes().length;
+
+        positions.put(
+                key,
+                new Position(
+                        offset + valueOffset,
+                        value.getBytes().length,
+                        partitionsManager.getCurrentPartitionFilePath()
+                )
+        );
+        partitionsManager.update(valueOffset + value.getBytes().length);
+    }
+
+    String getCurrentPartitionFilePath() {
+        return partitionsManager.getCurrentPartitionFilePath();
     }
 }

@@ -11,14 +11,12 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
 public class FileMap implements StoreMap {
-    // TODO refactor
-    public static final String STANDARD_PATH = "/tmp/bigmap";
-    private final Index index;
-    private final String path;
 
-    public FileMap(Index index, String path) {
+    private final Index index;
+
+    public FileMap(
+            Index index) {
         this.index = index;
-        this.path = path;
     }
 
     @Override
@@ -27,7 +25,7 @@ public class FileMap implements StoreMap {
         if (positionOptional.isPresent()) {
             Position position = positionOptional.get();
             try {
-                RandomAccessFile reader = new RandomAccessFile(path, "r");
+                RandomAccessFile reader = new RandomAccessFile(position.getPartitionFilePath(), "r");
                 reader.seek(position.getOffset());
                 byte[] result = new byte[position.getLength()];
                 reader.read(result, 0, position.getLength());
@@ -42,9 +40,13 @@ public class FileMap implements StoreMap {
     }
 
     @Override
-    public void put(String key, String value) throws CriticalError {
+    synchronized public void put(String key, String value) throws CriticalError {
         String segment = key.getBytes().length + "," + value.getBytes().length + "\n" + key + value;
+        String path = index.getCurrentPartitionFilePath();
         try {
+            if (!Files.exists(Paths.get(path))) {
+                Files.createFile(Paths.get(path));
+            }
             Files.write(Paths.get(path), segment.getBytes(), StandardOpenOption.APPEND);
             index.update(key, value);
         } catch (IOException e) {
