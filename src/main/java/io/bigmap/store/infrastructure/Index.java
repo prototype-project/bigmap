@@ -96,7 +96,15 @@ class Index {
         return partitionsManager.getCurrentPartitionFilePath();
     }
 
-    String getPartitionsDirPath() {
-        return partitionsManager.getPartitionsDirPath();
+    Map<String, Position> getAllPositions() {
+        return positions; // immutable?
+    }
+
+    void removePartitions(List<String> partitionFilePaths) {
+        partitionsManager.removePartitions(partitionFilePaths);
+    }
+
+    List<String> getPartitionPaths() {
+        return partitionsManager.getPartitionPaths();
     }
 }

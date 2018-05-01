@@ -8,18 +8,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Optional;
+import java.util.*;
 
 public class FileMap implements StoreMap {
 
     private final Index index;
-    private final StoreMapFactory storeMapFactory;
 
-    FileMap(
-            Index index,
-            StoreMapFactory storeMapFactory) {
+    FileMap(Index index) {
         this.index = index;
-        this.storeMapFactory = storeMapFactory;
     }
 
     @Override
@@ -59,6 +55,12 @@ public class FileMap implements StoreMap {
         }
     }
 
-    void cleanup() {
+    synchronized void cleanup() {
+        Map<String, Position> positions = index.getAllPositions();
+        String lastPartitionFilePath = index.getCurrentPartitionFilePath();
+        Set<String> toDelete = new HashSet<>(index.getPartitionPaths());
+        toDelete.remove(lastPartitionFilePath);
+        positions.forEach((k, v) -> put(k, get(k).orElseThrow(CriticalError::new)));
+        index.removePartitions(new ArrayList<>(toDelete));
     }
 }

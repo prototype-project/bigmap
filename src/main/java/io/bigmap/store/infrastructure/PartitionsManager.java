@@ -3,6 +3,9 @@ package io.bigmap.store.infrastructure;
 import io.bigmap.store.CriticalError;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,7 +70,14 @@ class PartitionsManager {
         return partitionsDirPath + "/" + currentPartitionNumber;
     }
 
-    String getPartitionsDirPath() {
-        return partitionsDirPath;
+    void removePartitions(List<String> partitionFilePaths) {
+        try {
+            for (String path: partitionFilePaths) {
+                Files.delete(Paths.get(path));
+            }
+        } catch (IOException e) {
+            throw new CriticalError();
+        }
+
     }
 }

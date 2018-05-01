@@ -1,7 +1,5 @@
 package io.bigmap.store.infrastructure;
 
-import io.bigmap.store.StoreMap;
-
 public class StoreMapFactory {
     private final String partitionsDirPath;
     private final int partitionSizeThresholdBytes;
@@ -13,9 +11,7 @@ public class StoreMapFactory {
         this.partitionSizeThresholdBytes = partitionSizeThresholdBytes;
     }
 
-    public StoreMap create() {
-        return new FileMap(
-                new Index(new PartitionsManager(partitionsDirPath, partitionSizeThresholdBytes)),
-                this);
+    public FileMap create() {
+        return new FileMap(new Index(new PartitionsManager(partitionsDirPath, partitionSizeThresholdBytes)));
     }
 }
