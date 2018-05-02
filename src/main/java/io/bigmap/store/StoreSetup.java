@@ -19,7 +19,16 @@ public class StoreSetup {
         this.replicas = ImmutableList.copyOf(replicas);
     }
 
+    public void setAsReplica() {
+        this.role = Role.REPLICA;
+        this.replicas = ImmutableList.copyOf(new ArrayList<>());
+    }
+
     public List<String> getReplicas() {
         return replicas;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }

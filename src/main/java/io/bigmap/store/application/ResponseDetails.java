@@ -13,7 +13,9 @@ public class ResponseDetails {
     private final String message;
 
     @JsonCreator
-    ResponseDetails(@JsonProperty("code") int code, @JsonProperty("message") String message) {
+    ResponseDetails(
+            @JsonProperty("code") int code,
+            @JsonProperty("message") String message) {
         this.code = code;
         this.message = message;
     }

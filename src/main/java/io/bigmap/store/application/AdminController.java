@@ -1,5 +1,6 @@
 package io.bigmap.store.application;
 
+import io.bigmap.store.Role;
 import io.bigmap.store.StoreSetup;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +19,28 @@ class AdminController {
     }
 
     @PutMapping(path = {"/set-as-master"})
-    void put(@RequestBody List<String> replicas) {
+    @ResponseStatus(value = HttpStatus.OK)
+    void setAsMaster(@RequestBody List<String> replicas) {
         if (replicas == null) {
             throw new NullValueException();
         }
         storeSetup.setAsMaster(replicas);
+    }
+
+    @PutMapping(path = {"/set-as-replica"})
+    @ResponseStatus(value = HttpStatus.OK)
+    void setAsReplica() {
+        storeSetup.setAsReplica();
+    }
+
+    @GetMapping(path = {"/config"})
+    @ResponseStatus(value = HttpStatus.OK)
+    Object currentSetup() {
+        if (storeSetup.getRole().equals(Role.MASTER)) {
+            return new StoreMasterSetupDto(Role.MASTER, storeSetup.getReplicas());
+        } else {
+            return new StoreReplicaSetupDto(Role.REPLICA);
+        }
     }
 
     @ExceptionHandler(NullValueException.class)

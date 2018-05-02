@@ -3,7 +3,7 @@ package io.bigmap.store
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
-class StoreSpec extends BaseIntegrationSpec {
+class StoreBasicOperationsSpec extends BaseIntegrationSpec {
 
     RestTemplate restTemplate = new RestTemplate()
 
