@@ -2,7 +2,7 @@ package io.bigmap.store.application;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.bigmap.store.Role;
+import io.bigmap.store.domain.Role;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;

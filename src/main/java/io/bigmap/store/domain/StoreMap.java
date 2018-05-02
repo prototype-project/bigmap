@@ -1,4 +1,4 @@
-package io.bigmap.store;
+package io.bigmap.store.domain;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package io.bigmap.store;
+package io.bigmap.store.domain;
 
 public class CriticalError extends Error {
 }

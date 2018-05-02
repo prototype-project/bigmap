@@ -1,6 +1,6 @@
 package io.bigmap.store.infrastructure;
 
-import io.bigmap.store.CriticalError;
+import io.bigmap.store.domain.CriticalError;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -1,6 +1,6 @@
 package io.bigmap.store.application;
 
-import io.bigmap.store.CriticalError;
+import io.bigmap.store.domain.CriticalError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

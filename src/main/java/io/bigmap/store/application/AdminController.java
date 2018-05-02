@@ -1,7 +1,7 @@
 package io.bigmap.store.application;
 
-import io.bigmap.store.Role;
-import io.bigmap.store.StoreSetup;
+import io.bigmap.store.domain.Role;
+import io.bigmap.store.domain.StoreSetup;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

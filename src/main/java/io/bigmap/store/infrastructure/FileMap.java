@@ -1,7 +1,7 @@
 package io.bigmap.store.infrastructure;
 
-import io.bigmap.store.CriticalError;
-import io.bigmap.store.StoreMap;
+import io.bigmap.store.domain.CriticalError;
+import io.bigmap.store.domain.StoreMap;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -1,7 +1,7 @@
 package io.bigmap.store.infrastructure;
 
-import io.bigmap.store.ReplicaNotifier;
-import io.bigmap.store.StoreSetup;
+import io.bigmap.store.domain.ReplicaNotifier;
+import io.bigmap.store.domain.StoreSetup;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.client.AsyncRestTemplate;
 

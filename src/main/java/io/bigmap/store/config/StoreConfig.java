@@ -1,6 +1,6 @@
 package io.bigmap.store.config;
 
-import io.bigmap.store.StoreSetup;
+import io.bigmap.store.domain.StoreSetup;
 import io.bigmap.store.infrastructure.AsyncHttpReplicaNotifier;
 import io.bigmap.store.infrastructure.FileMap;
 import io.bigmap.store.infrastructure.FileMapCleanupScheduler;

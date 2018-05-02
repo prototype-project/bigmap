@@ -1,6 +1,7 @@
-package io.bigmap.store;
+package io.bigmap.store.domain;
 
 import com.google.common.collect.ImmutableList;
+import io.bigmap.store.domain.Role;
 
 import java.util.ArrayList;
 import java.util.List;
