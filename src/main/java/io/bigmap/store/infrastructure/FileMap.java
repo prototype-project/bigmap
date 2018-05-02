@@ -48,11 +48,22 @@ public class FileMap implements StoreMap {
         String segment = key.getBytes().length + "," + value.getBytes().length + "\n" + key + value;
         String path = index.getCurrentPartitionFilePath();
         try {
-            if (!Files.exists(Paths.get(path))) {
-                Files.createFile(Paths.get(path));
-            }
             Files.write(Paths.get(path), segment.getBytes(), StandardOpenOption.APPEND);
             index.update(key, value);
+            putCounter++;
+        } catch (IOException e) {
+            throw new CriticalError();
+        }
+    }
+
+    @Override
+    synchronized public void delete(String key)
+            throws CriticalError {
+        String tombstone = key.getBytes().length + ",-1\n" + key;
+        String path = index.getCurrentPartitionFilePath();
+        try {
+            Files.write(Paths.get(path), tombstone.getBytes(), StandardOpenOption.APPEND);
+            index.delete(key);
             putCounter++;
         } catch (IOException e) {
             throw new CriticalError();

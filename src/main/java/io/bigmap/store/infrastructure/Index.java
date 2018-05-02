@@ -52,19 +52,26 @@ class Index {
             int keyLength = Integer.valueOf(keyAndValueLengthAsArray[0]);
             int valueLength = Integer.valueOf(keyAndValueLengthAsArray[1]);
 
+
             byte[] keyBytes = new byte[keyLength];
             reader.read(keyBytes, 0, keyLength);
             String key = new String(keyBytes, StandardCharsets.UTF_8);
+            String value = "";
 
-            byte[] valueBytes = new byte[valueLength];
-            reader.read(valueBytes, 0, valueLength);
-            String value = new String(valueBytes, StandardCharsets.UTF_8);
+            if (valueLength == -1) { // tombstone
+                positions.remove(key);
+                valueLength = 0;
+            } else {
+                byte[] valueBytes = new byte[valueLength];
+                reader.read(valueBytes, 0, valueLength);
+                value = new String(valueBytes, StandardCharsets.UTF_8);
 
-            Position position = new Position(
-                    offset + keyAndValueLength.getBytes().length + newLineCharLength + keyLength,
-                    valueLength,
-                    partitionFilePath);
-            positions.put(key, position);
+                Position position = new Position(
+                        offset + keyAndValueLength.getBytes().length + newLineCharLength + keyLength,
+                        valueLength,
+                        partitionFilePath);
+                positions.put(key, position);
+            }
 
             offset += keyAndValueLength.getBytes().length + newLineCharLength + keyLength + valueLength;
             lineReader.skip(key.length() + value.length());
@@ -90,6 +97,12 @@ class Index {
                 )
         );
         partitionsManager.update(valueOffset + value.getBytes().length);
+    }
+
+    void delete(String key) {
+        String positionPrefix = key.getBytes().length + ",-1\n";
+        positions.remove(key);
+        partitionsManager.update(positionPrefix.getBytes().length + key.getBytes().length);
     }
 
     String getCurrentPartitionFilePath() {

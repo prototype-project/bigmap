@@ -74,4 +74,21 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         then:
         thrown(HttpClientErrorException)
     }
+
+    def "should delete key from store if exists"() {
+        given:
+        String key1 = UUID.randomUUID()
+
+        and:
+        restTemplate.put(localUrl("/${key1}"), "value")
+
+        when:
+        restTemplate.delete(localUrl("/${key1}"))
+
+        and:
+        restTemplate.getForEntity(localUrl("/${key1}"), String.class)
+
+        then:
+        thrown(HttpClientErrorException)
+    }
 }

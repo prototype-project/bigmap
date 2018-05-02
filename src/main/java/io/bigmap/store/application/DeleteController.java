@@ -8,15 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping(value = {"/"})
-class PutController {
+class DeleteController {
 
     private final StoreMap storeMap;
     private final ReplicaNotifier replicaNotifier;
     private final StoreSetup storeSetup;
 
-    PutController(
+    DeleteController(
             StoreMap storeMap,
             ReplicaNotifier replicaNotifier,
             StoreSetup storeSetup) {
@@ -25,30 +26,20 @@ class PutController {
         this.storeSetup = storeSetup;
     }
 
-    @PutMapping(path = {"{key}"})
-    void put(@PathVariable String key, @RequestBody String value) {
-        if (value == null) {
-            throw new NullValueException();
-        }
+    @DeleteMapping(path = {"{key}"})
+    void delete(@PathVariable String key) {
         if (storeSetup.getRole().equals(Role.REPLICA)) {
             throw new ProhibitedOperationException();
         }
 
-        storeMap.put(key, value);
-        replicaNotifier.notifyReplicasOnPut(key, value);
-    }
-
-    @ExceptionHandler(NullValueException.class)
-    public ResponseEntity<ResponseDetails> handleNotFound() {
-        return new ResponseEntity<ResponseDetails>(
-                new ResponseDetails(2, "Value cant be empty."),
-                HttpStatus.BAD_REQUEST);
+        storeMap.delete(key);
+        replicaNotifier.notifyReplicasOnDelete(key);
     }
 
     @ExceptionHandler(ProhibitedOperationException.class)
     public ResponseEntity<ResponseDetails> handleReplicaPut() {
         return new ResponseEntity<ResponseDetails>(
-                new ResponseDetails(3, "Cant write to replica."),
+                new ResponseDetails(1, "Cant delete from replica."),
                 HttpStatus.BAD_REQUEST);
     }
 }

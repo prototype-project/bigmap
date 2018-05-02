@@ -67,7 +67,16 @@ class PartitionsManager {
     }
 
     String getCurrentPartitionFilePath() {
-        return partitionsDirPath + "/" + currentPartitionNumber;
+        String path = partitionsDirPath + "/" + currentPartitionNumber;
+
+        if (!Files.exists(Paths.get(path))) {
+            try {
+                Files.createFile(Paths.get(path));
+            } catch (IOException e) {
+                throw new CriticalError();
+            }
+        }
+        return path;
     }
 
     void removePartitions(List<String> partitionFilePaths) {

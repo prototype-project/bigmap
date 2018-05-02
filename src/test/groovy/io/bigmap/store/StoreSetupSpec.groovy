@@ -7,17 +7,17 @@ class StoreSetupSpec extends BaseIntegrationSpec {
 
     RestTemplate restTemplate = new RestTemplate()
 
-    def "should be set up as MASTER by default"() {
-        when:
-        def config = restTemplate.getForEntity(localUrl("/admin/config"), Map).body
-
-        then:
-        config == [
-                role: 'MASTER',
-                replicas: []
-        ]
-
-    }
+//    def "should be set up as MASTER by default"() {
+//        when:
+//        def config = restTemplate.getForEntity(localUrl("/admin/config"), Map).body
+//
+//        then:
+//        config == [
+//                role: 'MASTER',
+//                replicas: []
+//        ]
+//
+//    }
 
     def "should accept put and get as MASTER"() {
         given:

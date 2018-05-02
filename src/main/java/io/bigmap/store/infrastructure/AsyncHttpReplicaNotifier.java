@@ -15,7 +15,12 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
     }
 
     @Override
-    public void notifyReplicas(String key, String value) {
+    public void notifyReplicasOnPut(String key, String value) {
         storeSetup.getReplicas().forEach(r -> restTemplate.put(r + "/" + key, new HttpEntity<>(value)));
+    }
+
+    @Override
+    public void notifyReplicasOnDelete(String key) {
+
     }
 }
