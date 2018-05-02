@@ -27,10 +27,10 @@ class StoreSetupSpec extends BaseIntegrationSpec {
         restTemplate.put(localUrl("/admin/set-as-master"), [])
 
         when:
-        restTemplate.put(localUrl("/${key1}"), "value")
+        restTemplate.put(localUrl("/map/${key1}"), "value")
 
         then:
-        restTemplate.getForEntity(localUrl("/${key1}"), String.class).body == "value"
+        restTemplate.getForEntity(localUrl("/map/${key1}"), String.class).body == "value"
     }
 
     def "should accept get as REPLICA"() {
@@ -41,13 +41,13 @@ class StoreSetupSpec extends BaseIntegrationSpec {
         restTemplate.put(localUrl("/admin/set-as-master"), [])
 
         and:
-        restTemplate.put(localUrl("/${key1}"), 'value')
+        restTemplate.put(localUrl("/map/${key1}"), 'value')
 
         and:
         restTemplate.put(localUrl("/admin/set-as-replica"), null)
 
         when:
-        def result = restTemplate.getForEntity(localUrl("/${key1}"), String.class).body
+        def result = restTemplate.getForEntity(localUrl("/map/${key1}"), String.class).body
 
         then:
         result == 'value'
@@ -75,7 +75,7 @@ class StoreSetupSpec extends BaseIntegrationSpec {
         String key1 = UUID.randomUUID()
 
         when:
-        restTemplate.put(localUrl("/${key1}"), 'value')
+        restTemplate.put(localUrl("/map/${key1}"), 'value')
 
         then:
         thrown(HttpClientErrorException)

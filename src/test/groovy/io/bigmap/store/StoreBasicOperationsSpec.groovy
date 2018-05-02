@@ -21,22 +21,22 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         String value3 = UUID.randomUUID()
 
         when:
-        restTemplate.put(localUrl("/${key1}"), value1)
+        restTemplate.put(localUrl("/map/${key1}"), value1)
 
         then:
-        restTemplate.getForEntity(localUrl("/${key1}"), String.class).body == value1
+        restTemplate.getForEntity(localUrl("/map/${key1}"), String.class).body == value1
 
         when:
-        restTemplate.put(localUrl("/${key2}"), value2)
+        restTemplate.put(localUrl("/map/${key2}"), value2)
 
         then:
-        restTemplate.getForEntity(localUrl("/${key2}"), String.class).body == value2
+        restTemplate.getForEntity(localUrl("/map/${key2}"), String.class).body == value2
 
         when:
-        restTemplate.put(localUrl("/${key3}"), value3)
+        restTemplate.put(localUrl("/map/${key3}"), value3)
 
         then:
-        restTemplate.getForEntity(localUrl("/${key3}"), String.class).body == value3
+        restTemplate.getForEntity(localUrl("/map/${key3}"), String.class).body == value3
     }
 
     def "should override existing value"() {
@@ -44,13 +44,13 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         String key1 = UUID.randomUUID()
 
         and:
-        restTemplate.put(localUrl("/${key1}"), "oldValue")
+        restTemplate.put(localUrl("/map/${key1}"), "oldValue")
 
         when:
-        restTemplate.put(localUrl("/${key1}"), "newValue")
+        restTemplate.put(localUrl("/map/${key1}"), "newValue")
 
         then:
-        restTemplate.getForEntity(localUrl("/${key1}"), String.class).body == "newValue"
+        restTemplate.getForEntity(localUrl("/map/${key1}"), String.class).body == "newValue"
     }
 
     def "should return 404 when key not found"() {
@@ -58,7 +58,7 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         String key1 = UUID.randomUUID()
 
         when:
-        restTemplate.getForEntity(localUrl("/${key1}"), String.class)
+        restTemplate.getForEntity(localUrl("/map/${key1}"), String.class)
 
         then:
         thrown(HttpClientErrorException)
@@ -69,7 +69,7 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         String key1 = UUID.randomUUID()
 
         when:
-        restTemplate.put(localUrl("/${key1}"), null)
+        restTemplate.put(localUrl("/map/${key1}"), null)
 
         then:
         thrown(HttpClientErrorException)
@@ -80,13 +80,13 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         String key1 = UUID.randomUUID()
 
         and:
-        restTemplate.put(localUrl("/${key1}"), "value")
+        restTemplate.put(localUrl("/map/${key1}"), "value")
 
         when:
-        restTemplate.delete(localUrl("/${key1}"))
+        restTemplate.delete(localUrl("/map/${key1}"))
 
         and:
-        restTemplate.getForEntity(localUrl("/${key1}"), String.class)
+        restTemplate.getForEntity(localUrl("/map/${key1}"), String.class)
 
         then:
         thrown(HttpClientErrorException)

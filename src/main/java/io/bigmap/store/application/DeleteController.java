@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping(value = {"/"})
+@RequestMapping(value = {"/map"})
 class DeleteController {
 
     private final StoreMap storeMap;

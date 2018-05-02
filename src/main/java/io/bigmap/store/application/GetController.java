@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping(value = {"/"})
+@RequestMapping(value = {"/map"})
 class GetController {
 
     private final StoreMap storeMap;

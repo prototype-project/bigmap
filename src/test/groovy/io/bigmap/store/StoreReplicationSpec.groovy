@@ -30,10 +30,10 @@ class StoreReplicationSpec extends BaseIntegrationSpec {
         clientRestTemplate.put(localUrl("/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
-        clientRestTemplate.put(localUrl("/${key1}"), 'value')
+        clientRestTemplate.put(localUrl("/map/${key1}"), 'value')
 
         then:
-        postRequestedFor(urlEqualTo("/${key1}"))
+        postRequestedFor(urlEqualTo("/map/${key1}"))
                 .withRequestBody(new EqualToPattern('value'))
     }
 
@@ -44,10 +44,10 @@ class StoreReplicationSpec extends BaseIntegrationSpec {
         clientRestTemplate.put(localUrl("/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
-        clientRestTemplate.delete(localUrl("/${key1}"))
+        clientRestTemplate.delete(localUrl("/map/${key1}"))
 
         then:
-        deleteRequestedFor(urlEqualTo("/${key1}"))
+        deleteRequestedFor(urlEqualTo("/map/${key1}"))
     }
 
 }

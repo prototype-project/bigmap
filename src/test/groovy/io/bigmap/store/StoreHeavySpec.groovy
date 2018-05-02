@@ -34,9 +34,9 @@ class StoreHeavySpec extends BaseIntegrationSpec {
                 @Override
                 Boolean call() throws Exception {
                     items.forEach({value ->
-                        restTemplate.put(localUrl("/${key}"), value)
+                        restTemplate.put(localUrl("/map/${key}"), value)
                     })
-                    return restTemplate.getForEntity(localUrl("/${key}"), String.class).body == items.last()
+                    return restTemplate.getForEntity(localUrl("/map/${key}"), String.class).body == items.last()
                 }
             }))
         })
