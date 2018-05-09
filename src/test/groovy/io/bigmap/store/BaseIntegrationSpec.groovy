@@ -1,5 +1,6 @@
 package io.bigmap.store
 
+import io.bigmap.StoreApplication
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity
