@@ -4,6 +4,8 @@ import io.bigmap.store.domain.ReplicaNotifier;
 import io.bigmap.store.domain.Role;
 import io.bigmap.store.domain.StoreMap;
 import io.bigmap.store.domain.StoreSetup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = {"/map"})
 class PutController {
+
+    private static final Logger log = LoggerFactory.getLogger(PutController.class);
 
     private final StoreMap storeMap;
     private final ReplicaNotifier replicaNotifier;
@@ -27,6 +31,8 @@ class PutController {
 
     @PutMapping(path = {"{key}"})
     void put(@PathVariable String key, @RequestBody String value) {
+        log.info("PUT key: " + key + " value: " + value);
+
         if (value == null) {
             throw new NullValueException();
         }
@@ -34,6 +40,7 @@ class PutController {
         storeMap.put(key, value);
 
         if (storeSetup.getRole().equals(Role.MASTER)) {
+            log.info("NOTIFY-PUT key: " + key + " value: " + value);
             replicaNotifier.notifyReplicasOnPut(key, value);
         }
 
