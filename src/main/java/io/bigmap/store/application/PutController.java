@@ -30,25 +30,19 @@ class PutController {
         if (value == null) {
             throw new NullValueException();
         }
-        if (storeSetup.getRole().equals(Role.REPLICA)) {
-            throw new ProhibitedOperationException();
-        }
 
         storeMap.put(key, value);
-        replicaNotifier.notifyReplicasOnPut(key, value);
+
+        if (storeSetup.getRole().equals(Role.MASTER)) {
+            replicaNotifier.notifyReplicasOnPut(key, value);
+        }
+
     }
 
     @ExceptionHandler(NullValueException.class)
     public ResponseEntity<ResponseDetails> handleNotFound() {
         return new ResponseEntity<ResponseDetails>(
                 new ResponseDetails(2, "Value cant be empty."),
-                HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(ProhibitedOperationException.class)
-    public ResponseEntity<ResponseDetails> handleReplicaPut() {
-        return new ResponseEntity<ResponseDetails>(
-                new ResponseDetails(3, "Cant write to replica."),
                 HttpStatus.BAD_REQUEST);
     }
 }

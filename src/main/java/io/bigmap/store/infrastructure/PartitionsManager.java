@@ -20,6 +20,7 @@ class PartitionsManager {
     PartitionsManager(
             String partitionsDirPath,
             int partitionSizeThresholdBytes) {
+        new File(partitionsDirPath).mkdirs();
         this.partitionsDirPath = partitionsDirPath;
         this.partitionSizeThreshold = partitionSizeThresholdBytes;
         this.currentPartitionNumber = getCurrentPartitionNumber(partitionsDirPath) + 1;
