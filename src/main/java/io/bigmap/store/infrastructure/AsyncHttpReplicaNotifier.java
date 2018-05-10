@@ -23,7 +23,7 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
     public void notifyReplicasOnPut(String key, String value) {
         storeSetup.getReplicas()
                 .forEach(r ->
-                        restTemplate.put(r + "/" + key, new HttpEntity<>(value))
+                        restTemplate.put(r + "/map/" + key, new HttpEntity<>(value))
                                 .addCallback(
                                         result -> {
                                             log.info("REPLICATED key: " + key + " value: " + value);
