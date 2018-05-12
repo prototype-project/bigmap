@@ -1,7 +1,6 @@
 package io.bigmap.store.application;
 
 import io.bigmap.store.domain.StoreMap;
-import io.bigmap.store.infrastructure.AsyncHttpReplicaNotifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
