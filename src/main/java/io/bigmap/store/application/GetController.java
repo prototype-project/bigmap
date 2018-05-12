@@ -12,12 +12,12 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping(value = {"/map"})
 class GetController {
-
     private static final Logger log = LoggerFactory.getLogger(GetController.class);
 
     private final StoreMap storeMap;
 
-    GetController(StoreMap storeMap) {
+    GetController(
+            StoreMap storeMap) {
         this.storeMap = storeMap;
     }
 

@@ -1,10 +1,6 @@
-package io.bigmap.store.config;
+package io.bigmap.store.infrastructure;
 
 import io.bigmap.store.domain.StoreSetup;
-import io.bigmap.store.infrastructure.AsyncHttpReplicaNotifier;
-import io.bigmap.store.infrastructure.FileMap;
-import io.bigmap.store.infrastructure.FileMapCleanupScheduler;
-import io.bigmap.store.infrastructure.StoreMapFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.AsyncRestTemplate;
