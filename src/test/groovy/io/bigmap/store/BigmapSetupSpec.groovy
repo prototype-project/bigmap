@@ -19,4 +19,18 @@ class BigmapSetupSpec extends BaseIntegrationSpec {
         ]
     }
 
+    def "should return MASTER config when set to MASTER"() {
+        given:
+        restTemplate.put(localUrl("/admin/set-as-master"), [])
+
+        when:
+        def config = restTemplate.getForEntity(localUrl("/admin/config"), Map).body
+
+        then:
+        config == [
+                role: 'MASTER',
+                replicas: []
+        ]
+    }
+
 }

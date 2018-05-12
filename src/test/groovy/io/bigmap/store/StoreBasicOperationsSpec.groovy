@@ -91,4 +91,8 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         then:
         thrown(HttpClientErrorException)
     }
+
+    def "should accept all operations no matter if set as MASTER or REPLICA"() {
+        
+    }
 }

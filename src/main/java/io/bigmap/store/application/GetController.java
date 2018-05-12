@@ -1,6 +1,9 @@
 package io.bigmap.store.application;
 
 import io.bigmap.store.domain.StoreMap;
+import io.bigmap.store.infrastructure.AsyncHttpReplicaNotifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,8 @@ import java.util.NoSuchElementException;
 @RequestMapping(value = {"/map"})
 class GetController {
 
+    private static final Logger log = LoggerFactory.getLogger(AsyncHttpReplicaNotifier.class);
+
     private final StoreMap storeMap;
 
     GetController(StoreMap storeMap) {
@@ -20,6 +25,7 @@ class GetController {
     @GetMapping(path = {"{key}"})
     @ResponseStatus(value = HttpStatus.OK)
     String get(@PathVariable String key) {
+        log.info("GET key: " + key);
         return storeMap.get(key).get();
     }
 

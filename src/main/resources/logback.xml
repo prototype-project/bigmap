@@ -2,17 +2,18 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-    <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
-        <syslogHost>logs5.papertrailapp.com</syslogHost>
-        <port>51113</port>
-        <facility>USER</facility>
-        <suffixPattern>${PAPERTRAIL_APP:-app} %highlight([%.-1level]) %35.35logger{35}:\t%m\t%cyan%ex{5}</suffixPattern>
-        <throwableExcluded>true</throwableExcluded>
-    </appender>
-
-    <root level="INFO">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="SYSLOG" />
-    </root>
+    <springProfile name="prod">
+        <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+            <syslogHost>logs5.papertrailapp.com</syslogHost>
+            <port>51113</port>
+            <facility>USER</facility>
+            <suffixPattern>${PAPERTRAIL_APP:-app} %highlight([%.-1level]) %35.35logger{35}:\t%m\t%cyan%ex{5}</suffixPattern>
+            <throwableExcluded>true</throwableExcluded>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="SYSLOG" />
+        </root>
+    </springProfile>
 
 </configuration>

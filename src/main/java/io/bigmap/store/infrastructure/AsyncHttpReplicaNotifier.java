@@ -26,16 +26,22 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
                         restTemplate.put(r + "/map/" + key, new HttpEntity<>(value))
                                 .addCallback(
                                         result -> {
-                                            log.info("REPLICATED key: " + key + " value: " + value);
+                                            log.info("PUT REPLICATED key: " + key + " value: " + value);
                                         },
                                         ex -> {
-                                            log.warn("REPLICATION FAILED key: " + key + " value: " + value);
+                                            log.warn("PUT REPLICATION FAILED key: " + key + " value: " + value);
                                         })
                 );
     }
 
     @Override
     public void notifyReplicasOnDelete(String key) {
-        storeSetup.getReplicas().forEach(r -> restTemplate.delete(r + "/" + key));
+        storeSetup.getReplicas().forEach(r ->
+                restTemplate.delete(r + "/" + key).addCallback(result -> {
+                            log.info("DELETE REPLICATED key: " + key);
+                        },
+                        ex -> {
+                            log.warn("DELETE REPLICATION FAILED key: " + key);
+                        }));
     }
 }
