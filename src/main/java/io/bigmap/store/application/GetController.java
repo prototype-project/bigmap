@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 @RequestMapping(value = {"/map"})
 class GetController {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncHttpReplicaNotifier.class);
+    private static final Logger log = LoggerFactory.getLogger(GetController.class);
 
     private final StoreMap storeMap;
 

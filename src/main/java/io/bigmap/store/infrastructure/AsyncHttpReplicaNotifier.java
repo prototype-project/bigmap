@@ -37,7 +37,7 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
     @Override
     public void notifyReplicasOnDelete(String key) {
         storeSetup.getReplicas().forEach(r ->
-                restTemplate.delete(r + "/" + key).addCallback(result -> {
+                restTemplate.delete(r + "/map" + key).addCallback(result -> {
                             log.info("DELETE REPLICATED key: " + key);
                         },
                         ex -> {
