@@ -8,9 +8,9 @@ class ApplicationMetrics {
     private final Timer getMethodTimer;
     private final Timer putMethodTimer;
     private final Timer deleteMethodTimer;
-    private static final String GET_METHOD = "application.map.get";
-    private static final String PUT_METHOD = "application.map.put";
-    private static final String DELETE_METHOD = "application.map.delete";
+    private static final String GET_METHOD = "application.map.get.time";
+    private static final String PUT_METHOD = "application.map.put.time";
+    private static final String DELETE_METHOD = "application.map.delete.time";
 
     ApplicationMetrics() {
         this.getMethodTimer = Timer.builder(GET_METHOD)
