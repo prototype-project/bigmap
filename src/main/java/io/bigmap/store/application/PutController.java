@@ -35,6 +35,8 @@ class PutController {
                 throw new NullValueException();
             }
 
+            applicationMetrics.putMethodInputBytesCounter().increment(value.getBytes().length);
+
             storeMap.put(key, value);
 
             if (storeSetup.getRole().equals(Role.MASTER)) {

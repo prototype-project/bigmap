@@ -24,7 +24,11 @@ class GetController {
     @ResponseStatus(value = HttpStatus.OK)
     String get(@PathVariable String key) {
         return applicationMetrics.mapGetTimer()
-                .record(() -> storeMap.get(key).get());
+                .record(() -> {
+                    String result = storeMap.get(key).get();
+                    applicationMetrics.getMethodOutputBytesCounter().increment(result.getBytes().length);
+                    return result;
+                });
     }
 
     @ExceptionHandler(NoSuchElementException.class)
