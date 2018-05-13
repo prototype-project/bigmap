@@ -1,22 +1,26 @@
 package io.bigmap.store.infrastructure;
 
-public class StoreMapFactory {
+class StoreMapFactory {
     private final String partitionsDirPath;
     private final int partitionSizeThresholdBytes;
     private final int numberOfPutsThreshold;
+    private final InfrastructureMetrics infrastructureMetrics;
 
-    public StoreMapFactory(
+    StoreMapFactory(
             String partitionsDirPath,
             int partitionSizeThresholdBytes,
-            int numberOfPutsThreshold) {
+            int numberOfPutsThreshold,
+            InfrastructureMetrics infrastructureMetrics) {
         this.partitionsDirPath = partitionsDirPath;
         this.partitionSizeThresholdBytes = partitionSizeThresholdBytes;
         this.numberOfPutsThreshold = numberOfPutsThreshold;
+        this.infrastructureMetrics = infrastructureMetrics;
     }
 
-    public FileMap create() {
+    FileMap create() {
         return new FileMap(
-                new Index(new PartitionsManager(partitionsDirPath, partitionSizeThresholdBytes)),
-                numberOfPutsThreshold);
+                new Index(new PartitionsManager(partitionsDirPath, partitionSizeThresholdBytes), infrastructureMetrics),
+                numberOfPutsThreshold,
+                infrastructureMetrics);
     }
 }

@@ -15,11 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 class Index {
     private final Map<String, Position> positions = new ConcurrentHashMap<>();
     private final PartitionsManager partitionsManager;
+    private final InfrastructureMetrics infrastructureMetrics;
 
-    Index(PartitionsManager partitionsManager) {
+    Index(PartitionsManager partitionsManager, InfrastructureMetrics infrastructureMetrics) {
         try {
             loadPositions(partitionsManager.getPartitionPaths(), this.positions);
             this.partitionsManager = partitionsManager;
+            this.infrastructureMetrics = infrastructureMetrics;
+            infrastructureMetrics.meterMapSize(positions);
         } catch (IOException e) {
             throw new CriticalError();
         }

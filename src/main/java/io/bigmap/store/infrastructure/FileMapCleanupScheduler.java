@@ -8,7 +8,7 @@ public class FileMapCleanupScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(FileMapCleanupScheduler.class);
 
-    private static final long REFRESH_RATE_IN_SECONDS = 100;
+    private static final long REFRESH_RATE_IN_SECONDS = 60;
     private final FileMap storeMap;
 
     public FileMapCleanupScheduler(FileMap storeMap) {

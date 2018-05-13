@@ -11,11 +11,11 @@ class ApplicationMetrics {
     private final Timer deleteMethodTimer;
     private final Counter putMethodInputBytesCounter;
     private final Counter getMethodOutputBytesCounter;
-    private static final String GET_METHOD = "application.map.get.time";
-    private static final String PUT_METHOD = "application.map.put.time";
-    private static final String DELETE_METHOD = "application.map.delete.time";
-    private static final String PUT_METHOD_INPUT = "application.map.put.input.bytes";
-    private static final String GET_METHOD_OUTPUT = "application.map.get.output.bytes";
+    private static final String GET_METHOD = "map.get.time";
+    private static final String PUT_METHOD = "map.put.time";
+    private static final String DELETE_METHOD = "map.delete.time";
+    private static final String PUT_METHOD_INPUT = "map.put.input.bytes";
+    private static final String GET_METHOD_OUTPUT = "map.get.output.bytes";
 
     ApplicationMetrics() {
         this.getMethodTimer = Timer.builder(GET_METHOD)
