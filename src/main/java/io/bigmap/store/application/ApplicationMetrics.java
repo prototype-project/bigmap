@@ -13,9 +13,15 @@ class ApplicationMetrics {
     private static final String DELETE_METHOD = "application.map.delete";
 
     ApplicationMetrics() {
-        this.getMethodTimer = Metrics.timer(GET_METHOD);
-        this.putMethodTimer = Metrics.timer(PUT_METHOD);
-        this.deleteMethodTimer = Metrics.timer(DELETE_METHOD);
+        this.getMethodTimer = Timer.builder(GET_METHOD)
+                .publishPercentiles(0.99, 0.95, 0.90, 0.50)
+                .register(Metrics.globalRegistry);
+        this.putMethodTimer = Timer.builder(PUT_METHOD)
+                .publishPercentiles(0.99, 0.95, 0.90, 0.50)
+                .register(Metrics.globalRegistry);
+        this.deleteMethodTimer = Timer.builder(DELETE_METHOD)
+                .publishPercentiles(0.99, 0.95, 0.90, 0.50)
+                .register(Metrics.globalRegistry);
     }
 
     Timer mapGetTimer() {
