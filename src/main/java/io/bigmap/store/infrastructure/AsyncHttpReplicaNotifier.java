@@ -2,21 +2,23 @@ package io.bigmap.store.infrastructure;
 
 import io.bigmap.store.domain.ReplicaNotifier;
 import io.bigmap.store.domain.StoreSetup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.client.AsyncRestTemplate;
 
 public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncHttpReplicaNotifier.class);
 
     private final AsyncRestTemplate restTemplate;
     private final StoreSetup storeSetup;
+    private final InfrastructureMetrics infrastructureMetrics;
 
-    public AsyncHttpReplicaNotifier(AsyncRestTemplate restTemplate, StoreSetup storeSetup) {
+    public AsyncHttpReplicaNotifier(
+            AsyncRestTemplate restTemplate,
+            StoreSetup storeSetup,
+            InfrastructureMetrics infrastructureMetrics) {
         this.restTemplate = restTemplate;
         this.storeSetup = storeSetup;
+        this.infrastructureMetrics = infrastructureMetrics;
     }
 
     @Override
@@ -26,10 +28,10 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
                         restTemplate.put(r + "/map/" + key, new HttpEntity<>(value))
                                 .addCallback(
                                         result -> {
-                                            log.info("PUT REPLICATED key: " + key + " value: " + value);
+                                            infrastructureMetrics.notifySuccessCounter().increment();
                                         },
                                         ex -> {
-                                            log.warn("PUT REPLICATION FAILED key: " + key + " value: " + value);
+                                            infrastructureMetrics.notifyFailureCounter().increment();
                                         })
                 );
     }
@@ -38,10 +40,10 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
     public void notifyReplicasOnDelete(String key) {
         storeSetup.getReplicas().forEach(r ->
                 restTemplate.delete(r + "/map" + key).addCallback(result -> {
-                            log.info("DELETE REPLICATED key: " + key);
+                            infrastructureMetrics.notifySuccessCounter().increment();
                         },
                         ex -> {
-                            log.warn("DELETE REPLICATION FAILED key: " + key);
+                            infrastructureMetrics.notifyFailureCounter().increment();
                         }));
     }
 }

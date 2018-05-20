@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FileMap implements StoreMap {
 
@@ -16,6 +17,7 @@ public class FileMap implements StoreMap {
     private int putCounter = 0;
     private final int numberOfPutsThreshold;
     private final InfrastructureMetrics infrastructureMetrics;
+    private final AtomicLong mapSizeBytes;
 
     FileMap(
             Index index,
@@ -24,6 +26,7 @@ public class FileMap implements StoreMap {
         this.index = index;
         this.numberOfPutsThreshold = numberOfPutsThreshold;
         this.infrastructureMetrics = infrastructureMetrics;
+        this.mapSizeBytes = new AtomicLong(0);
     }
 
     @Override
@@ -78,12 +81,18 @@ public class FileMap implements StoreMap {
     synchronized void cleanup() {
         if (putCounter >= numberOfPutsThreshold) {
             infrastructureMetrics.cleanupTimer().record(() -> {
+                long currentMapSizeBytes = 0;
                 Map<String, Position> positions = index.getAllPositions();
                 String lastPartitionFilePath = index.getCurrentPartitionFilePath();
                 Set<String> toDelete = new HashSet<>(index.getPartitionPaths());
                 toDelete.remove(lastPartitionFilePath);
-                positions.forEach((k, v) -> put(k, get(k).orElseThrow(CriticalError::new)));
+                for (String k: positions.keySet()) {
+                    String value = get(k).orElseThrow(CriticalError::new);
+                    put(k, value);
+                    currentMapSizeBytes += k.getBytes().length + value.getBytes().length;
+                }
                 index.removePartitions(new ArrayList<>(toDelete));
+                mapSizeBytes.set(currentMapSizeBytes);
             });
         }
     }
