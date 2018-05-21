@@ -42,7 +42,10 @@ public class StoreConfig {
     }
 
     @Bean
-    AsyncHttpReplicaNotifier replicaNotifier(AsyncRestTemplate asyncRestTemplate, StoreSetup storeSetup) {
-        return new AsyncHttpReplicaNotifier(asyncRestTemplate, storeSetup);
+    AsyncHttpReplicaNotifier replicaNotifier(
+            AsyncRestTemplate asyncRestTemplate,
+            StoreSetup storeSetup,
+            InfrastructureMetrics infrastructureMetrics) {
+        return new AsyncHttpReplicaNotifier(asyncRestTemplate, storeSetup, infrastructureMetrics);
     }
 }

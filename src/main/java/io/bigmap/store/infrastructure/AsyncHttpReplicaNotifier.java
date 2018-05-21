@@ -7,7 +7,6 @@ import org.springframework.web.client.AsyncRestTemplate;
 
 public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
 
-
     private final AsyncRestTemplate restTemplate;
     private final StoreSetup storeSetup;
     private final InfrastructureMetrics infrastructureMetrics;
