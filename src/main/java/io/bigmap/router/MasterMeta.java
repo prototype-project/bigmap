@@ -1,13 +1,13 @@
 package io.bigmap.router;
 
-public class MasterMeta {
+class MasterMeta {
     private final String url;
 
     MasterMeta(String url) {
         this.url = url;
     }
 
-    public String getConfigUrl() {
+    String getConfigUrl() {
         return url + "/map/admin/config";
     }
 }
