@@ -1,5 +1,7 @@
 package io.bigmap.store.domain;
 
+import io.bigmap.common.CriticalError;
+
 import java.util.Optional;
 
 public interface StoreMap {

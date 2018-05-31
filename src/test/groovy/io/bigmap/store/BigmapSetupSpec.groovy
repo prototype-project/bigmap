@@ -1,5 +1,6 @@
 package io.bigmap.store
 
+import io.bigmap.BaseIntegrationSpec
 import org.springframework.web.client.RestTemplate
 
 class BigmapSetupSpec extends BaseIntegrationSpec {

@@ -37,7 +37,7 @@ public class StoreConfig {
     }
 
     @Bean
-    AsyncRestTemplate restTemplate() {
+    AsyncRestTemplate asyncRestTemplate() {
         return new AsyncRestTemplate();
     }
 

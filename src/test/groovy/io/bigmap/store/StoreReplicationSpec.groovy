@@ -2,6 +2,7 @@ package io.bigmap.store
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.matching.EqualToPattern
+import io.bigmap.BaseIntegrationSpec
 import org.springframework.web.client.RestTemplate
 
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
@@ -24,6 +25,7 @@ class StoreReplicationSpec extends BaseIntegrationSpec {
     }
 
     def "should notify all replicas on put if configured as master"() {
+        // todo refactor map paths
         given:
         String key1 = UUID.randomUUID()
 

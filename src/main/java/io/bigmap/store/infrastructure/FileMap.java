@@ -1,6 +1,6 @@
 package io.bigmap.store.infrastructure;
 
-import io.bigmap.store.domain.CriticalError;
+import io.bigmap.common.CriticalError;
 import io.bigmap.store.domain.StoreMap;
 
 import java.io.*;
