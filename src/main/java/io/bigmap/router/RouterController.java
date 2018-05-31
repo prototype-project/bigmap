@@ -15,7 +15,7 @@ public class RouterController {
 
     private final RouterSetupRepository routerSetupRepository;
 
-    public RouterController(RouterSetupRepository routerSetupRepository) {
+    RouterController(RouterSetupRepository routerSetupRepository) {
         this.routerSetupRepository = routerSetupRepository;
     }
 
