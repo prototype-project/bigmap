@@ -24,6 +24,7 @@ class Master {
     WireMockServer server
     List<Replica> replicas
     static String TEST_KEY = "KEY"
+    static String TEST_NOT_FOUND_KEY = "NOT_FOUND_KEY"
 
     Master(WireMockServer server, List<Replica> replicas) {
         this.server = server
@@ -56,6 +57,12 @@ class Master {
                 .willReturn(aResponse()
                 .withStatus(200)
                 .withBody("someValue")
+        ))
+
+        server.stubFor(get(urlMatching("/map/${TEST_NOT_FOUND_KEY}"))
+                .willReturn(aResponse()
+                .withStatus(404)
+                .withBody("KEY_NOT_FOUND")
         ))
     }
 
@@ -152,16 +159,13 @@ class RouterSpec extends BaseIntegrationSpec {
         response.getBody() == "someValue"
     }
 
-//    def "should return errors from map back to client"() {
-//        given:
-//        String key = UUID.randomUUID().toString()
-//
-//        when:
-//        restTemplate.getForEntity(localUrl("/router/${key}"), String.class)
-//
-//        then:
-//        def ex = thrown(HttpClientErrorException)
-//        ex.statusCode == HttpStatus.NOT_FOUND
-//        ex.message == "KEY_NOT_FOUND"
-//    }
+    def "should return errors from map back to client"() {
+        when:
+        restTemplate.getForEntity(localUrl("/router/${Master.TEST_NOT_FOUND_KEY}"), String.class)
+
+        then:
+        def ex = thrown(HttpClientErrorException)
+        ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString == "KEY_NOT_FOUND"
+    }
 }

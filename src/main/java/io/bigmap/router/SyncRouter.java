@@ -3,6 +3,8 @@ package io.bigmap.router;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import io.bigmap.common.CriticalError;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -25,12 +27,20 @@ class SyncRouter implements Router {
 
     @Override
     public String routeGet(String key) {
-        return restTemplate.getForEntity(pickMaster(key).getKeyUrl(key), String.class).getBody();
+        try {
+            return restTemplate.getForEntity(pickMaster(key).getKeyUrl(key), String.class).getBody();
+        } catch (HttpClientErrorException e) {
+            throw new ClientException(e.getResponseBodyAsString(), e, e.getStatusCode());
+        }
     }
 
     @Override
     public void routePut(String key, String value) {
-        restTemplate.put(pickMaster(key).getKeyUrl(key), value, String.class);
+        try {
+            restTemplate.put(pickMaster(key).getKeyUrl(key), value, String.class);
+        } catch (HttpClientErrorException e) {
+            throw new ClientException(e.getResponseBodyAsString(), e, e.getStatusCode());
+        }
     }
 
     private RouterSetup.MasterSetup pickMaster(String key) {
