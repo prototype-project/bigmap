@@ -4,10 +4,13 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import groovy.json.JsonOutput
 import io.bigmap.BaseIntegrationSpec
 import org.apache.commons.lang3.StringUtils
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import static com.github.tomakehurst.wiremock.client.WireMock.get
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson
 import static com.github.tomakehurst.wiremock.client.WireMock.put
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor
@@ -16,9 +19,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
+
 class Master {
     WireMockServer server
     List<Replica> replicas
+    static String TEST_KEY = "KEY"
 
     Master(WireMockServer server, List<Replica> replicas) {
         this.server = server
@@ -43,13 +48,23 @@ class Master {
                     replicas: replicas.collect{r -> StringUtils.chop(r.server.url(""))}
         ]
         ))))
-        server.stubFor(put(urlMatching("/map/.*"))
+        server.stubFor(put(urlMatching("/map/${TEST_KEY}"))
                 .willReturn(aResponse()
                 .withStatus(200)))
+
+        server.stubFor(get(urlMatching("/map/${TEST_KEY}"))
+                .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("someValue")
+        ))
     }
 
     boolean gotPut(String key) {
         server.countRequestsMatching(putRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
+    }
+
+    boolean gotGet(String key) {
+        server.countRequestsMatching(getRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
     }
 }
 
@@ -91,6 +106,9 @@ class RouterSpec extends BaseIntegrationSpec {
         this.masters.forEach{m ->
             m.stubConfig()
         }
+
+        restTemplate.put(localUrl("/router/admin/config"),
+                ['http://localhost:8081', 'http://localhost:8082'], List)
     }
 
     def cleanup() {
@@ -102,11 +120,7 @@ class RouterSpec extends BaseIntegrationSpec {
     }
 
     def "should setup router"() {
-        when:
-        restTemplate.put(localUrl("/router/admin/config"),
-                ['http://localhost:8081', 'http://localhost:8082'], List)
-
-        then:
+        expect:
         restTemplate.getForEntity(localUrl("/router/admin/config"), List).body == [
                 [
                         master  : 'http://localhost:8081',
@@ -120,21 +134,34 @@ class RouterSpec extends BaseIntegrationSpec {
     }
 
     def "should route PUT to single master"() {
-        given:
-        restTemplate.put(localUrl("/router/admin/config"),
-                ['http://localhost:8081', 'http://localhost:8082'], List)
-
-        and:
-        String key = UUID.randomUUID().toString()
-
         when:
-        restTemplate.put(localUrl("/router/$key"), 'someValue', String)
+        restTemplate.put(localUrl("/router/${Master.TEST_KEY}"), 'someValue', String)
 
         then:
-        findMaster(FIRST_MASTER).gotPut(key) != findMaster(SECOND_MASTER).gotPut(key)
+        findMaster(FIRST_MASTER).gotPut(Master.TEST_KEY) != findMaster(SECOND_MASTER).gotPut(Master.TEST_KEY)
     }
 
-    def "should return errors from map back to client"() {
+    def "should route GET to single master"() {
+        when:
+        def response = restTemplate.getForEntity(localUrl("/router/${Master.TEST_KEY}"), String)
 
+        then:
+        findMaster(FIRST_MASTER).gotGet(Master.TEST_KEY) != findMaster(SECOND_MASTER).gotGet(Master.TEST_KEY)
+
+        and:
+        response.getBody() == "someValue"
     }
+
+//    def "should return errors from map back to client"() {
+//        given:
+//        String key = UUID.randomUUID().toString()
+//
+//        when:
+//        restTemplate.getForEntity(localUrl("/router/${key}"), String.class)
+//
+//        then:
+//        def ex = thrown(HttpClientErrorException)
+//        ex.statusCode == HttpStatus.NOT_FOUND
+//        ex.message == "KEY_NOT_FOUND"
+//    }
 }

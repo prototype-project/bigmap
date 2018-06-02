@@ -45,4 +45,10 @@ public class RouterController {
         router.routePut(key, body);
     }
 
+    @GetMapping(path = {"{key}"})
+    @ResponseStatus(value = HttpStatus.OK)
+    String routeGet(@PathVariable String key) {
+        return router.routeGet(key);
+    }
+
 }

@@ -35,7 +35,7 @@ class RouterSetup {
             return masterAddress;
         }
 
-        String getPutUrl(String key) {
+        String getKeyUrl(String key) {
             return getMasterAddress() + "/map/" + key;
         }
     }

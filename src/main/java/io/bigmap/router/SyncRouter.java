@@ -24,9 +24,13 @@ class SyncRouter implements Router {
     }
 
     @Override
+    public String routeGet(String key) {
+        return restTemplate.getForEntity(pickMaster(key).getKeyUrl(key), String.class).getBody();
+    }
+
+    @Override
     public void routePut(String key, String value) {
-        RouterSetup.MasterSetup master = pickMaster(key);
-        restTemplate.put(master.getPutUrl(key), value, String.class);
+        restTemplate.put(pickMaster(key).getKeyUrl(key), value, String.class);
     }
 
     private RouterSetup.MasterSetup pickMaster(String key) {
