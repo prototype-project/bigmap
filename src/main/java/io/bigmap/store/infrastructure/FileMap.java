@@ -30,8 +30,7 @@ public class FileMap implements StoreMap {
     }
 
     @Override
-    public Optional<String> get(String key)
-            throws CriticalError {
+    public Optional<String> get(String key) throws CriticalError {
         return index.get(key)
                 .map(position -> {
                     try {
@@ -61,8 +60,7 @@ public class FileMap implements StoreMap {
     }
 
     @Override
-    synchronized public void delete(String key)
-            throws CriticalError {
+    synchronized public void delete(String key) throws CriticalError {
         String tombstone = key.getBytes().length + ",-1\n" + key;
         String path = index.getCurrentPartitionFilePath();
         try {

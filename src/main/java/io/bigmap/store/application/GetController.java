@@ -2,7 +2,6 @@ package io.bigmap.store.application;
 
 import io.bigmap.store.domain.StoreMap;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -24,17 +23,17 @@ class GetController {
     @ResponseStatus(value = HttpStatus.OK)
     String get(@PathVariable String key) {
         return applicationMetrics.mapGetTimer()
-                .record(() -> {
-                    String result = storeMap.get(key).get();
-                    applicationMetrics.getMethodOutputBytesCounter().increment(result.getBytes().length);
-                    return result;
-                });
+                .record(() -> storeMap.get(key)
+                        .map(result -> {
+                            applicationMetrics.getMethodOutputBytesCounter().increment(result.getBytes().length);
+                            return result;
+                        }).orElseThrow(NoSuchElementException::new)
+                );
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ResponseDetails> handleNotFound() {
-        return new ResponseEntity<ResponseDetails>(
-                new ResponseDetails(1, "Key not found"),
-                HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFound() {
+        return "KEY_NOT_FOUND";
     }
 }

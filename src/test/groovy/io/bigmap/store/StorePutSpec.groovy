@@ -2,7 +2,6 @@ package io.bigmap.store
 
 import io.bigmap.BaseIntegrationSpec
 import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestTemplate
 
 class StorePutSpec extends BaseIntegrationSpec {
