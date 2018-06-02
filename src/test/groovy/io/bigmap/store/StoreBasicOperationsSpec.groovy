@@ -65,17 +65,6 @@ class StoreBasicOperationsSpec extends BaseIntegrationSpec {
         thrown(HttpClientErrorException)
     }
 
-    def "should return 400 when value not provided"() {
-        given:
-        String key1 = UUID.randomUUID()
-
-        when:
-        restTemplate.put(localUrl("/map/${key1}"), null)
-
-        then:
-        thrown(HttpClientErrorException)
-    }
-
     def "should delete key from store if exists"() {
         given:
         String key1 = UUID.randomUUID()

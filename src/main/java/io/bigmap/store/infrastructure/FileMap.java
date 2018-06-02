@@ -32,27 +32,23 @@ public class FileMap implements StoreMap {
     @Override
     public Optional<String> get(String key)
             throws CriticalError {
-        Optional<Position> positionOptional = index.get(key);
-        if (positionOptional.isPresent()) {
-            Position position = positionOptional.get();
-            try {
-                RandomAccessFile reader = new RandomAccessFile(position.getPartitionFilePath(), "r");
-                reader.seek(position.getOffset());
-                byte[] result = new byte[position.getLength()];
-                reader.read(result, 0, position.getLength());
-                reader.close();
-                return Optional.of(new String(result, StandardCharsets.UTF_8));
-            } catch (IOException e) {
-                throw new CriticalError();
-            }
-        } else {
-            return Optional.empty();
-        }
+        return index.get(key)
+                .map(position -> {
+                    try {
+                        RandomAccessFile reader = new RandomAccessFile(position.getPartitionFilePath(), "r");
+                        reader.seek(position.getOffset());
+                        byte[] result = new byte[position.getLength()];
+                        reader.read(result, 0, position.getLength());
+                        reader.close();
+                        return new String(result, StandardCharsets.UTF_8);
+                    } catch (IOException e) {
+                        throw new CriticalError("Critical error in FileMap.get", e);
+                    }
+                });
     }
 
     @Override
-    synchronized public void put(String key, String value)
-            throws CriticalError {
+    synchronized public void put(String key, String value) throws CriticalError {
         String segment = key.getBytes().length + "," + value.getBytes().length + "\n" + key + value;
         String path = index.getCurrentPartitionFilePath();
         try {
@@ -60,7 +56,7 @@ public class FileMap implements StoreMap {
             index.update(key, value);
             putCounter++;
         } catch (IOException e) {
-            throw new CriticalError();
+            throw new CriticalError("Critical error in FileMap.put", e);
         }
     }
 
@@ -74,7 +70,7 @@ public class FileMap implements StoreMap {
             index.delete(key);
             putCounter++;
         } catch (IOException e) {
-            throw new CriticalError();
+            throw new CriticalError("Critical error in FileMap.delete", e);
         }
     }
 

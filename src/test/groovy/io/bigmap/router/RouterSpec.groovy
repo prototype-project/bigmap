@@ -133,4 +133,8 @@ class RouterSpec extends BaseIntegrationSpec {
         then:
         findMaster(FIRST_MASTER).gotPut(key) != findMaster(SECOND_MASTER).gotPut(key)
     }
+
+    def "should return errors from map back to client"() {
+
+    }
 }

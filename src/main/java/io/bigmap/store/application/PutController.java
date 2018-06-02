@@ -31,6 +31,7 @@ class PutController {
     }
 
     @PutMapping(path = {"{key}"})
+    @ResponseStatus(HttpStatus.OK)
     void put(@PathVariable String key, @RequestBody String value) {
         applicationMetrics.mapPutTimer().record(() ->
             Optional.ofNullable(value)
@@ -49,7 +50,7 @@ class PutController {
 
     @ExceptionHandler(NullValueException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseDetails handleNotFound() {
-        return new ResponseDetails(2, "Value cant be empty.");
+    public String handleNotFound() {
+        return "NULL_VALUE";
     }
 }
