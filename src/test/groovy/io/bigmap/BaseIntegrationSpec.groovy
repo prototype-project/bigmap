@@ -13,7 +13,7 @@ import spock.lang.Specification
         properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration
-abstract class BaseIntegrationSpec extends Specification {
+class BaseIntegrationSpec extends Specification {
 
     @Value('${local.server.port}')
     int port

@@ -17,6 +17,7 @@ public class StoreConfig {
         return storeMapFactory.create();
     }
 
+    // todo remove factory
     @Bean
     StoreMapFactory storeMapFactory(InfrastructureMetrics infrastructureMetrics) {
         return new StoreMapFactory(

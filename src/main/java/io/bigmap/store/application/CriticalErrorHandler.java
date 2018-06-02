@@ -1,7 +1,9 @@
 package io.bigmap.store.application;
 
 import io.bigmap.common.CriticalError;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,8 +16,8 @@ class CriticalErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CriticalError.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    String handleCriticalError(Exception error, WebRequest request) {
+    ResponseEntity<String> handleCriticalError(Exception error, WebRequest request) {
         // todo metrics and logs
-        return "INTERNAL_SERVER_ERROR";
+        return new ResponseEntity<>("INTERNAL_SERVER_ERROR", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
