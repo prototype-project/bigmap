@@ -23,26 +23,17 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
     @Override
     public void notifyReplicasOnPut(String key, String value) {
         storeSetup.getReplicas()
-                .forEach(r ->
-                        restTemplate.put(r + "/map/" + key, new HttpEntity<>(value))
-                                .addCallback(
-                                        result -> {
-                                            infrastructureMetrics.notifySuccessCounter().increment();
-                                        },
-                                        ex -> {
-                                            infrastructureMetrics.notifyFailureCounter().increment();
-                                        })
-                );
+                .forEach(r -> restTemplate.put(r + "/map/" + key, new HttpEntity<>(value))
+                        .addCallback(
+                                result -> infrastructureMetrics.notifySuccessCounter().increment(),
+                                ex -> infrastructureMetrics.notifyFailureCounter().increment()));
     }
 
     @Override
     public void notifyReplicasOnDelete(String key) {
         storeSetup.getReplicas().forEach(r ->
-                restTemplate.delete(r + "/map" + key).addCallback(result -> {
-                            infrastructureMetrics.notifySuccessCounter().increment();
-                        },
-                        ex -> {
-                            infrastructureMetrics.notifyFailureCounter().increment();
-                        }));
+                restTemplate.delete(r + "/map" + key).addCallback(result ->
+                                infrastructureMetrics.notifySuccessCounter().increment(),
+                        ex -> infrastructureMetrics.notifyFailureCounter().increment()));
     }
 }

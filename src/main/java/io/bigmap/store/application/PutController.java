@@ -36,11 +36,11 @@ class PutController {
         applicationMetrics.mapPutTimer().record(() ->
             Optional.ofNullable(value)
                     .ifPresentOrElse(v -> {
-                        storeMap.put(key, value);
+                        storeMap.put(key, v);
                         applicationMetrics.putMethodInputBytesCounter()
-                                .increment(value.getBytes().length);
+                                .increment(v.getBytes().length);
                         if (storeSetup.getRole().equals(Role.MASTER)) {
-                            replicaNotifier.notifyReplicasOnPut(key, value);
+                            replicaNotifier.notifyReplicasOnPut(key, v);
                         }
                     }, () -> {
                         throw new NullValueException();
