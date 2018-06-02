@@ -17,6 +17,7 @@ class CriticalErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CriticalError.class)
     ResponseEntity<Object> handleCriticalError(Exception error, WebRequest request) {
+        // todo metrics and logs
         return handleExceptionInternal(error, new HashMap<>(),
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
