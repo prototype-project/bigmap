@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping(value = {"/map"})
 class PutController {
@@ -30,25 +32,24 @@ class PutController {
 
     @PutMapping(path = {"{key}"})
     void put(@PathVariable String key, @RequestBody String value) {
-        applicationMetrics.mapPutTimer().record(() -> {
-            if (value == null) {
-                throw new NullValueException();
-            }
-
-            applicationMetrics.putMethodInputBytesCounter().increment(value.getBytes().length);
-
-            storeMap.put(key, value);
-
-            if (storeSetup.getRole().equals(Role.MASTER)) {
-                replicaNotifier.notifyReplicasOnPut(key, value);
-            }
-        });
+        applicationMetrics.mapPutTimer().record(() ->
+            Optional.ofNullable(value)
+                    .ifPresentOrElse(v -> {
+                        storeMap.put(key, value);
+                        applicationMetrics.putMethodInputBytesCounter()
+                                .increment(value.getBytes().length);
+                        if (storeSetup.getRole().equals(Role.MASTER)) {
+                            replicaNotifier.notifyReplicasOnPut(key, value);
+                        }
+                    }, () -> {
+                        throw new NullValueException();
+                    })
+        );
     }
 
     @ExceptionHandler(NullValueException.class)
-    public ResponseEntity<ResponseDetails> handleNotFound() {
-        return new ResponseEntity<ResponseDetails>(
-                new ResponseDetails(2, "Value cant be empty."),
-                HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseDetails handleNotFound() {
+        return new ResponseDetails(2, "Value cant be empty.");
     }
 }

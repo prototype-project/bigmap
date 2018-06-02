@@ -119,7 +119,7 @@ class RouterSpec extends BaseIntegrationSpec {
         ]
     }
 
-    def "should route PUT to master"() {
+    def "should route PUT to single master"() {
         given:
         restTemplate.put(localUrl("/router/admin/config"),
                 ['http://localhost:8081', 'http://localhost:8082'], List)

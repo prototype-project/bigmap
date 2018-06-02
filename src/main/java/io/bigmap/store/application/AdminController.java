@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = {"/admin"})
+@RequestMapping(value = {"/map/admin"})
 class AdminController {
 
     private final StoreSetup storeSetup;

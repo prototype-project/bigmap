@@ -29,7 +29,7 @@ class StoreReplicationSpec extends BaseIntegrationSpec {
         given:
         String key1 = UUID.randomUUID()
 
-        clientRestTemplate.put(localUrl("/admin/set-as-master"), ['http://localhost:8081'])
+        clientRestTemplate.put(localUrl("/map/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
         clientRestTemplate.put(localUrl("/map/${key1}"), 'value')
@@ -43,7 +43,7 @@ class StoreReplicationSpec extends BaseIntegrationSpec {
         given:
         String key1 = UUID.randomUUID()
 
-        clientRestTemplate.put(localUrl("/admin/set-as-master"), ['http://localhost:8081'])
+        clientRestTemplate.put(localUrl("/map/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
         clientRestTemplate.delete(localUrl("/map/${key1}"))
