@@ -11,4 +11,11 @@ public class RouterConfig {
     RouterSetupRepository routerSetup(RestTemplate restTemplate) {
         return new SyncRouterSetupRepository(restTemplate);
     }
+
+    @Bean
+    Router syncRouter(
+            RestTemplate restTemplate,
+            RouterSetupRepository routerSetup) {
+        return new SyncRouter(restTemplate, routerSetup);
+    }
 }
