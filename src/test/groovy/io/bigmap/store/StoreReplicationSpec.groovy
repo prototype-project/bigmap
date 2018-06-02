@@ -13,43 +13,42 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 class StoreReplicationSpec extends BaseIntegrationSpec {
 
     RestTemplate clientRestTemplate = new RestTemplate()
-    WireMockServer wireMockServer1
+    WireMockServer server
 
     def setup() {
-        this.wireMockServer1 = new WireMockServer(wireMockConfig().port(8081))
-        wireMockServer1.start()
+        this.server = new WireMockServer(wireMockConfig().port(8081))
+        server.start()
     }
 
     def cleanup() {
-        this.wireMockServer1.stop()
+        this.server.stop()
     }
 
     def "should notify all replicas on put if configured as master"() {
-        // todo refactor map paths
         given:
-        String key1 = UUID.randomUUID()
+        String key = UUID.randomUUID()
 
         clientRestTemplate.put(localUrl("/map/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
-        clientRestTemplate.put(localUrl("/map/${key1}"), 'value')
+        clientRestTemplate.put(localUrl("/map/${key}"), 'value')
 
         then:
-        postRequestedFor(urlEqualTo("/map/${key1}"))
+        postRequestedFor(urlEqualTo("/map/${key}"))
                 .withRequestBody(new EqualToPattern('value'))
     }
 
     def "should notify all replicas on delete if configured as master"() {
         given:
-        String key1 = UUID.randomUUID()
+        String key = UUID.randomUUID()
 
         clientRestTemplate.put(localUrl("/map/admin/set-as-master"), ['http://localhost:8081'])
 
         when:
-        clientRestTemplate.delete(localUrl("/map/${key1}"))
+        clientRestTemplate.delete(localUrl("/map/${key}"))
 
         then:
-        deleteRequestedFor(urlEqualTo("/map/${key1}"))
+        deleteRequestedFor(urlEqualTo("/map/${key}"))
     }
 
 }
