@@ -9,6 +9,8 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import static com.github.tomakehurst.wiremock.client.WireMock.delete
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson
@@ -53,6 +55,10 @@ class Master {
                 .willReturn(aResponse()
                 .withStatus(200)))
 
+        server.stubFor(delete(urlMatching("/map/${TEST_KEY}"))
+                .willReturn(aResponse()
+                .withStatus(200)))
+
         replicas.each {r -> r.stub()}
     }
 
@@ -62,6 +68,10 @@ class Master {
 
     boolean gotGet(String key) {
         server.countRequestsMatching(getRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
+    }
+
+    boolean gotDelete(String key) {
+        server.countRequestsMatching(deleteRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
     }
 
     Replica getReplica(int replicaPort) {
@@ -176,7 +186,20 @@ class RouterSpec extends BaseIntegrationSpec {
         !findMaster(SECOND_MASTER).getReplica(SECOND_MASTER_SECOND_REPLICA).gotGet(Master.TEST_KEY)
 
         and:
+        !findMaster(FIRST_MASTER).gotGet(Master.TEST_KEY)
+        !findMaster(SECOND_MASTER).gotGet(Master.TEST_KEY)
+
+        and:
         response.getBody() == "someValue"
+    }
+
+    def "should route DELETE to single master"() {
+        when:
+        restTemplate.delete(localUrl("/router/${Master.TEST_KEY}"))
+
+        then:
+        findMaster(FIRST_MASTER).gotDelete(Master.TEST_KEY)
+        !findMaster(SECOND_MASTER).gotDelete(Master.TEST_KEY)
     }
 
     def "should return errors from map back to client"() {

@@ -43,6 +43,15 @@ class HttpRouter implements Router {
         }
     }
 
+    @Override
+    public void routeDelete(String key) {
+        try {
+            restTemplate.delete(pickMaster(key).getKeyUrl(key));
+        } catch (HttpClientErrorException e) {
+            throw new ClientException(e.getResponseBodyAsString(), e, e.getStatusCode());
+        }
+    }
+
     private RouterSetup.MasterSetup pickMaster(String key) {
         List<RouterSetup.MasterSetup> masters = routerSetup.get().getMasters();
         return Optional.of(HashPredicate.of(masters.size())

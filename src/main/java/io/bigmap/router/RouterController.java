@@ -51,4 +51,10 @@ public class RouterController {
         return router.routeGet(key);
     }
 
+    @DeleteMapping(path = {"{key}"})
+    @ResponseStatus(value = HttpStatus.OK)
+    void routeDelete(@PathVariable String key) {
+        router.routeDelete(key);
+    }
+
 }
