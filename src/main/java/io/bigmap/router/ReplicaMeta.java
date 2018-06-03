@@ -10,4 +10,8 @@ class ReplicaMeta {
     String getUrl() {
         return url;
     }
+
+    String getKeyUrl(String key) {
+        return getUrl() + "/map/" + key;
+    }
 }

@@ -41,7 +41,7 @@ class Master {
         server.stop()
     }
 
-    def stubConfig() {
+    def stub() {
         server.stubFor(get(urlEqualTo("/map/admin/config"))
                 .willReturn(okJson(JsonOutput.toJson([
                     role: 'MASTER',
@@ -53,17 +53,7 @@ class Master {
                 .willReturn(aResponse()
                 .withStatus(200)))
 
-        server.stubFor(get(urlMatching("/map/${TEST_KEY}"))
-                .willReturn(aResponse()
-                .withStatus(200)
-                .withBody("someValue")
-        ))
-
-        server.stubFor(get(urlMatching("/map/${TEST_NOT_FOUND_KEY}"))
-                .willReturn(aResponse()
-                .withStatus(404)
-                .withBody("KEY_NOT_FOUND")
-        ))
+        replicas.each {r -> r.stub()}
     }
 
     boolean gotPut(String key) {
@@ -73,6 +63,10 @@ class Master {
     boolean gotGet(String key) {
         server.countRequestsMatching(getRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
     }
+
+    Replica getReplica(int replicaPort) {
+        return replicas.find {r -> r.server.port() == replicaPort}
+    }
 }
 
 class Replica {
@@ -81,6 +75,24 @@ class Replica {
     Replica(WireMockServer server) {
         this.server = server
     }
+
+    def stub() {
+        server.stubFor(get(urlMatching("/map/${Master.TEST_KEY}"))
+                .willReturn(aResponse()
+                .withStatus(200)
+                .withBody("someValue")
+        ))
+
+        server.stubFor(get(urlMatching("/map/${Master.TEST_NOT_FOUND_KEY}"))
+                .willReturn(aResponse()
+                .withStatus(404)
+                .withBody("KEY_NOT_FOUND")
+        ))
+    }
+
+    boolean gotGet(String key) {
+        server.countRequestsMatching(getRequestedFor(urlPathMatching("/map/$key")).build()).count == 1
+    }
 }
 
 class RouterSpec extends BaseIntegrationSpec {
@@ -88,21 +100,25 @@ class RouterSpec extends BaseIntegrationSpec {
     RestTemplate restTemplate = new RestTemplate()
     static int FIRST_MASTER = 8081
     static int SECOND_MASTER = 8082
+    static int FIRST_MASTER_FIRST_REPLICA = 8090
+    static int FIRST_MASTER_SECOND_REPLICA = 8091
+    static int SECOND_MASTER_FIRST_REPLICA = 8092
+    static int SECOND_MASTER_SECOND_REPLICA = 8093
 
-    Map<Integer, List<String>> storeSetup = [
-            8081: ['8090', '8091'],
-            8082: ['8092', '8093']
+    Map<Integer, List<Integer>> storeSetup = [
+            8081: [FIRST_MASTER_FIRST_REPLICA, FIRST_MASTER_SECOND_REPLICA],
+            8082: [SECOND_MASTER_FIRST_REPLICA, SECOND_MASTER_SECOND_REPLICA]
     ]
 
     List<Master> masters
 
     def setup() {
         this.masters = [FIRST_MASTER, SECOND_MASTER].collect {masterPort->
-            List<String> replicaPorts = storeSetup[masterPort]
+            List<Integer> replicaPorts = storeSetup[masterPort]
             def replicas = replicaPorts.collect { replicaPort ->
-                new Replica(new WireMockServer(wireMockConfig().port(replicaPort.toInteger())))
+                new Replica(new WireMockServer(wireMockConfig().port(replicaPort)))
             }
-            def master = new WireMockServer(wireMockConfig().port(masterPort.toInteger()))
+            def master = new WireMockServer(wireMockConfig().port(masterPort))
             new Master(master, replicas)
         }
 
@@ -111,7 +127,7 @@ class RouterSpec extends BaseIntegrationSpec {
         }
 
         this.masters.forEach{m ->
-            m.stubConfig()
+            m.stub()
         }
 
         restTemplate.put(localUrl("/router/admin/config"),
@@ -145,15 +161,19 @@ class RouterSpec extends BaseIntegrationSpec {
         restTemplate.put(localUrl("/router/${Master.TEST_KEY}"), 'someValue', String)
 
         then:
-        findMaster(FIRST_MASTER).gotPut(Master.TEST_KEY) != findMaster(SECOND_MASTER).gotPut(Master.TEST_KEY)
+        findMaster(FIRST_MASTER).gotPut(Master.TEST_KEY)
+        !findMaster(SECOND_MASTER).gotPut(Master.TEST_KEY)
     }
 
-    def "should route GET to single master"() {
+    def "should route GET to single master replica"() {
         when:
         def response = restTemplate.getForEntity(localUrl("/router/${Master.TEST_KEY}"), String)
 
         then:
-        findMaster(FIRST_MASTER).gotGet(Master.TEST_KEY) != findMaster(SECOND_MASTER).gotGet(Master.TEST_KEY)
+        findMaster(FIRST_MASTER).getReplica(FIRST_MASTER_FIRST_REPLICA).gotGet(Master.TEST_KEY)
+        !findMaster(FIRST_MASTER).getReplica(FIRST_MASTER_SECOND_REPLICA).gotGet(Master.TEST_KEY)
+        !findMaster(SECOND_MASTER).getReplica(SECOND_MASTER_FIRST_REPLICA).gotGet(Master.TEST_KEY)
+        !findMaster(SECOND_MASTER).getReplica(SECOND_MASTER_SECOND_REPLICA).gotGet(Master.TEST_KEY)
 
         and:
         response.getBody() == "someValue"

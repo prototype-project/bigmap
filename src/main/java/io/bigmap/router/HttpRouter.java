@@ -3,7 +3,6 @@ package io.bigmap.router;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import io.bigmap.common.CriticalError;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,11 +13,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class SyncRouter implements Router {
+class HttpRouter implements Router {
     private final RestTemplate restTemplate;
     private final RouterSetupRepository routerSetup;
 
-    SyncRouter(
+    HttpRouter(
             RestTemplate restTemplate,
             RouterSetupRepository routerSetup) {
         this.restTemplate = restTemplate;
@@ -27,8 +26,9 @@ class SyncRouter implements Router {
 
     @Override
     public String routeGet(String key) {
+        RouterSetup.MasterSetup masterSetup = pickMaster(key);
         try {
-            return restTemplate.getForEntity(pickMaster(key).getKeyUrl(key), String.class).getBody();
+            return restTemplate.getForEntity(pickRouter(masterSetup, key).getKeyUrl(key), String.class).getBody();
         } catch (HttpClientErrorException e) {
             throw new ClientException(e.getResponseBodyAsString(), e, e.getStatusCode());
         }
@@ -44,10 +44,19 @@ class SyncRouter implements Router {
     }
 
     private RouterSetup.MasterSetup pickMaster(String key) {
-        return Optional.of(HashPredicate.of(routerSetup.get().getMasters().size())
+        List<RouterSetup.MasterSetup> masters = routerSetup.get().getMasters();
+        return Optional.of(HashPredicate.of(masters.size())
                 .match(key))
-                .map(masterIndex -> routerSetup.get().getMasters().get(masterIndex))
+                .map(masters::get)
                 .orElseThrow(() -> new CriticalError("Could not map index to master."));
+    }
+
+    private ReplicaMeta pickRouter(RouterSetup.MasterSetup masterSetup, String key) {
+        List<ReplicaMeta> replicas = masterSetup.getReplicaMetaList();
+        return Optional.of(HashPredicate.of(replicas.size())
+                .match(key))
+                .map(replicas::get)
+                .orElseThrow(() -> new CriticalError("Could not map index to replica."));
     }
 
     private static class PercentageRage {
@@ -72,7 +81,7 @@ class SyncRouter implements Router {
         static List<PercentageRage> of(int numberOfElements) {
             return IntStream.range(0, numberOfElements)
                     .mapToObj(i ->
-                            new PercentageRage(i, i * 100/numberOfElements, (i+1) * 100/numberOfElements))
+                            new PercentageRage(i, i * 100 / numberOfElements, (i + 1) * 100 / numberOfElements))
                     .collect(Collectors.toList());
         }
     }

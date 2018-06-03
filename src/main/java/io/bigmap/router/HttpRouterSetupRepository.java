@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
-public class SyncRouterSetupRepository implements RouterSetupRepository {
+public class HttpRouterSetupRepository implements RouterSetupRepository {
     private final RestTemplate restTemplate;
     private List<MasterMeta> masters;
 
-    SyncRouterSetupRepository(RestTemplate restTemplate) {
+    HttpRouterSetupRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
         this.masters = ImmutableList.copyOf(emptyList());
     }

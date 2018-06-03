@@ -9,13 +9,13 @@ public class RouterConfig {
 
     @Bean
     RouterSetupRepository routerSetup(RestTemplate restTemplate) {
-        return new SyncRouterSetupRepository(restTemplate);
+        return new HttpRouterSetupRepository(restTemplate);
     }
 
     @Bean
     Router syncRouter(
             RestTemplate restTemplate,
             RouterSetupRepository routerSetup) {
-        return new SyncRouter(restTemplate, routerSetup);
+        return new HttpRouter(restTemplate, routerSetup);
     }
 }
