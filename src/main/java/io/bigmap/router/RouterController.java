@@ -56,5 +56,4 @@ public class RouterController {
     void routeDelete(@PathVariable String key) {
         router.routeDelete(key);
     }
-
 }
