@@ -41,6 +41,9 @@ public class AsyncHttpReplicaNotifier implements ReplicaNotifier {
         storeSetup.getReplicas().forEach(r ->
                 restTemplate.delete(r + "/map/" + key).addCallback(result ->
                                 infrastructureMetrics.notifySuccessCounter().increment(),
-                        ex -> infrastructureMetrics.notifyFailureCounter().increment()));
+                        ex -> {
+                            infrastructureMetrics.notifyFailureCounter().increment();
+                            log.error(ex.getMessage());
+                        }));
     }
 }
