@@ -9,7 +9,8 @@ public class RouterConfig {
 
     @Bean
     RouterSetupRepository routerSetup(RestTemplate restTemplate) {
-        return new HttpRouterSetupRepository(restTemplate);
+        RouterSetupRepository httpRouterSetupRepository = new HttpRouterSetupRepository(restTemplate);
+        return new CachedRouterSetupRepository(httpRouterSetupRepository);
     }
 
     @Bean

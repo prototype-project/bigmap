@@ -45,7 +45,7 @@ class AdminController {
         }
     }
 
-    public static String getURL(HttpServletRequest request){
+    private String getURL(HttpServletRequest request){
         String fullURL = request.getRequestURL().toString();
         return fullURL.substring(0, StringUtils.ordinalIndexOf(fullURL, "/", 3));
     }
