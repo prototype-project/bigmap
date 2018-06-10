@@ -14,14 +14,19 @@ public class StoreMasterSetupDto {
     private final Role role;
 
     @NotEmpty
+    private final String address;
+
+    @NotEmpty
     private final List<String> replicas;
 
     @JsonCreator
     StoreMasterSetupDto(
             @JsonProperty("role") Role role,
-            @JsonProperty("replicas") List<String> replicas) {
+            @JsonProperty("replicas") List<String> replicas,
+            @JsonProperty("address") String address) {
         this.role = role;
         this.replicas = replicas;
+        this.address = address;
     }
 
     public Role getRole() {
@@ -30,5 +35,9 @@ public class StoreMasterSetupDto {
 
     public List<String> getReplicas() {
         return replicas;
+    }
+
+    public String getAddress() {
+        return address;
     }
 }

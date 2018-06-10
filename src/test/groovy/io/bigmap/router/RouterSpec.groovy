@@ -123,7 +123,7 @@ class RouterSpec extends BaseIntegrationSpec {
     List<Master> masters
 
     def setup() {
-        this.masters = [FIRST_MASTER, SECOND_MASTER].collect {masterPort->
+        this.masters = [FIRST_MASTER, SECOND_MASTER].collect { masterPort->
             List<Integer> replicaPorts = storeSetup[masterPort]
             def replicas = replicaPorts.collect { replicaPort ->
                 new Replica(new WireMockServer(wireMockConfig().port(replicaPort)))

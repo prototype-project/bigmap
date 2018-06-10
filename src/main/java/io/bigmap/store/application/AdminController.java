@@ -2,10 +2,12 @@ package io.bigmap.store.application;
 
 import io.bigmap.store.domain.Role;
 import io.bigmap.store.domain.StoreSetup;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -35,12 +37,17 @@ class AdminController {
 
     @GetMapping(path = {"/config"})
     @ResponseStatus(value = HttpStatus.OK)
-    Object currentSetup() {
+    Object currentSetup(HttpServletRequest request) {
         if (storeSetup.getRole().equals(Role.MASTER)) {
-            return new StoreMasterSetupDto(Role.MASTER, storeSetup.getReplicas());
+            return new StoreMasterSetupDto(Role.MASTER, storeSetup.getReplicas(), getURL(request));
         } else {
-            return new StoreReplicaSetupDto(Role.REPLICA);
+            return new StoreReplicaSetupDto(Role.REPLICA, getURL(request));
         }
+    }
+
+    public static String getURL(HttpServletRequest request){
+        String fullURL = request.getRequestURL().toString();
+        return fullURL.substring(0, StringUtils.ordinalIndexOf(fullURL, "/", 3));
     }
 
     @ExceptionHandler(NullValueException.class)

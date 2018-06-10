@@ -10,12 +10,21 @@ public class StoreReplicaSetupDto {
     @NotEmpty
     private final Role role;
 
+    private final String address;
+
     @JsonCreator
-    StoreReplicaSetupDto(@JsonProperty("role") Role role) {
+    StoreReplicaSetupDto(
+            @JsonProperty("role") Role role,
+            @JsonProperty("address") String address) {
         this.role = role;
+        this.address = address;
     }
 
     public Role getRole() {
         return role;
+    }
+
+    public String getAddress() {
+        return address;
     }
 }

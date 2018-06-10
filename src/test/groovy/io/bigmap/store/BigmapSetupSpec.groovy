@@ -16,6 +16,7 @@ class BigmapSetupSpec extends BaseIntegrationSpec {
 
         then:
         config == [
+                address: localUrl(''),
                 role: 'REPLICA'
         ]
     }
@@ -29,6 +30,7 @@ class BigmapSetupSpec extends BaseIntegrationSpec {
 
         then:
         config == [
+                address: localUrl(''),
                 role: 'MASTER',
                 replicas: []
         ]
